@@ -6,6 +6,14 @@ import { requestDto } from './dtos/requestDto';
 const app = express();
 const port = 3000;
 
+let cors = require('cors');
+app.use(express.json());
+
+app.use(cors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
 const _satLogic = new SatLogic();
 const _userLogic = new UserLogic();
@@ -18,6 +26,11 @@ app.get('/', (req, res) => {
 app.get('/checkSatellites', async (req, res) => {
   await initializeEE();
   await _satLogic.checkSats();
+  res.status(200).json("Satellites checked");
+});
+
+app.get('/results/:id', async (req, res) => {
+  await _userLogic.getResults(req.params.id);
   res.status(200).json("Satellites checked");
 });
 
