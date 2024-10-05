@@ -40,7 +40,7 @@ CREATE TABLE `PendingRequests` (
 
 LOCK TABLES `PendingRequests` WRITE;
 /*!40000 ALTER TABLE `PendingRequests` DISABLE KEYS */;
-INSERT INTO `PendingRequests` VALUES (1,'john.doe@example.com','John Doe','[{\"lat\": 40.7128, \"lon\": -74.0060}, {\"lat\": 34.0522, \"lon\": -118.2437}, {\"lat\": 51.5074, \"lon\": -0.1278}, {\"lat\": 35.6895, \"lon\": 139.6917}]');
+INSERT INTO `PendingRequests` VALUES (1,'john.doe@example.com','John Doe','[{\"lat\": 40.7128, \"lon\": -74.006}, {\"lat\": 34.0522, \"lon\": -118.2437}, {\"lat\": 51.5074, \"lon\": -0.1278}, {\"lat\": 35.6895, \"lon\": 139.6917}]');
 /*!40000 ALTER TABLE `PendingRequests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,6 +56,7 @@ CREATE TABLE `ResultsRequests` (
   `email` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `image` blob NOT NULL,
+  `sent` varchar(45) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -78,4 +79,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-05 11:20:41
+-- Dump completed on 2024-10-05 12:18:58
