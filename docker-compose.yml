@@ -24,5 +24,9 @@ services:
       MYSQL_HOST: mysql  # Set the MySQL hostname
       MYSQL_PORT: 3306    # MySQL port
 
+  front_end:
+    image: front_end
+    container_name: my_front_end
+
 volumes:
   mysql-data:
