@@ -8,15 +8,18 @@ from email.mime.image import MIMEImage
 import base64
 from io import BytesIO
 
-import mysql.connector
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+
+mysql_host = os.getenv('MYSQL_HOST', 'localhost')
+mysql_port = int(os.getenv('MYSQL_PORT', 3306))  
 
 # Database configuration
 db_config = {
-    'host': 'localhost',
-    'port': 3306,
+    'host': mysql_host,
+    'port': mysql_port,
     'user': 'myuser',
     'password': 'mypassword',
     'database': 'mydatabase'

@@ -1,11 +1,7 @@
-import React from "react";
-import {
-    TextField,
-    Button,
-    Typography,
-    Box,
-    Paper
-} from "@mui/material";
+import React, { useState } from "react";
+import { Button, Box, Paper, Stepper, Step, StepLabel } from "@mui/material";
+import UserDetailsForm from "@/components/user-details-panel/components/UserDetailsForm";
+import SatellitePropertiesForm from "@/components/user-details-panel/components/SatellitePropertiesForm";
 
 interface UserDetailsPanelProps {
     isOpen: boolean;
@@ -14,6 +10,8 @@ interface UserDetailsPanelProps {
     onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
     latLng: { lat: number; lng: number } | null;
+    satelliteData: any;
+    onSatelliteChange: (key: string, value: any) => void;
 }
 
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
@@ -23,7 +21,50 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                                                                onInputChange,
                                                                onSubmit,
                                                                latLng,
+                                                               satelliteData,
+                                                               onSatelliteChange
                                                            }) => {
+    const [activeStep, setActiveStep] = useState(0);
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
+
+    const steps = ["Personal Details", "Satellite Properties"];
+
+    const renderStepContent = (step: number) => {
+        switch (step) {
+            case 0:
+                return (
+                    <UserDetailsForm
+                        formData={formData}
+                        onInputChange={onInputChange}
+                        latLng={latLng}
+                    />
+                );
+            case 1:
+                return (
+                    <SatellitePropertiesForm
+                        satellite={satelliteData.satellite}
+                        cloudThreshold={satelliteData.cloudThreshold}
+                        mostRecentImage={satelliteData.mostRecentImage}
+                        metadata={satelliteData.metadata}
+                        dataValues={satelliteData.dataValues}
+                        spectralSignature={satelliteData.spectralSignature}
+                        fromDate={satelliteData.fromDate}
+                        toDate={satelliteData.toDate}
+                        onSatelliteChange={(key, value) => onSatelliteChange(key, value)}
+                    />
+                );
+            default:
+                return "Unknown step";
+        }
+    };
+
     return (
         <Paper
             elevation={3}
@@ -42,41 +83,54 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                 marginTop: "64px",
             }}
         >
-            <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h6">Enter your details</Typography>
-                {latLng && (
-                    <Typography variant="body2" gutterBottom>
-                        Latitude: {latLng.lat}, Longitude: {latLng.lng}
-                    </Typography>
+            <Stepper activeStep={activeStep} alternativeLabel>
+                {steps.map((label, index) => (
+                    <Step key={index}>
+                        <StepLabel>{label}</StepLabel>
+                    </Step>
+                ))}
+            </Stepper>
+
+            <Box sx={{ flexGrow: 1, mt: 2 }}>{renderStepContent(activeStep)}</Box>
+
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: activeStep > 0 ? "space-between" : "center",
+                    mt: 2,
+                }}
+            >
+                {activeStep > 0 && (
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleBack}
+                        sx={{ width: "48%" }}
+                    >
+                        Back
+                    </Button>
                 )}
-                <TextField
-                    label="Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={onInputChange}
-                    fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={onInputChange}
-                    fullWidth
-                    margin="normal"
-                />
+                {activeStep < steps.length - 1 ? (
+                    <Button
+                        variant="contained"
+                        onClick={handleNext}
+                        sx={{ width: activeStep > 0 ? "48%" : "100%" }}
+                    >
+                        Next
+                    </Button>
+                ) : (
+                    <Button
+                        variant="contained"
+                        onClick={onSubmit}
+                        sx={{ width: "48%" }}
+                    >
+                        Submit
+                    </Button>
+                )}
             </Box>
-            <Box>
-                <Button variant="contained" onClick={onSubmit} fullWidth>
-                    Submit
-                </Button>
-                <Button
-                    variant="text"
-                    color="secondary"
-                    onClick={onClose}
-                    fullWidth
-                >
+
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                <Button variant="text" color="secondary" onClick={onClose} fullWidth>
                     Close
                 </Button>
             </Box>

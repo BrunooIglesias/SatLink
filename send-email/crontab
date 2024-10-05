@@ -1,0 +1,2 @@
+* * * * * root python /app/script.py >> /var/log/cron.log 2>&1
+* * * * * root sleep 30; python /app/script.py >> /var/log/cron.log 2>&1
