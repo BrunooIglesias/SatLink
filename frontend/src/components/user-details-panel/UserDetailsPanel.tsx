@@ -1,21 +1,14 @@
 import React, { useState } from "react";
 import {
-    TextField,
     Button,
-    Typography,
     Box,
     Paper,
     Stepper,
     Step,
-    StepLabel,
-    MenuItem,
-    Checkbox,
-    FormControlLabel,
-    FormControl,
-    InputLabel,
-    Select,
-    FormGroup
+    StepLabel
 } from "@mui/material";
+import UserDetailsForm from "@/components/user-details-panel/components/UserDetailsForm";
+import SatellitePropertiesForm from "@/components/user-details-panel/components/SatellitePropertiesForm";
 
 interface UserDetailsPanelProps {
     isOpen: boolean;
@@ -51,133 +44,46 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
-    const handleSatelliteChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setSatellite(event.target.value as string);
-    };
-
-    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        switch (event.target.name) {
-            case 'metadata':
-                setMetadata(event.target.checked);
-                break;
-            case 'dataValues':
-                setDataValues(event.target.checked);
-                break;
-            case 'spectralSignature':
-                setSpectralSignature(event.target.checked);
-                break;
-        }
-    };
-
     const steps = ['Personal Details', 'Satellite Properties'];
 
     const renderStepContent = (step: number) => {
         switch (step) {
             case 0:
                 return (
-                    <Box>
-                        <Typography variant="h6">Enter your details</Typography>
-                        {latLng && (
-                            <Typography variant="body2" gutterBottom>
-                                <strong>Latitude:</strong> {latLng.lat.toFixed(6)} <br />
-                                <strong>Longitude:</strong> {latLng.lng.toFixed(6)}
-                            </Typography>
-                        )}
-                        <TextField
-                            label="Name"
-                            name="name"
-                            value={formData.name}
-                            onChange={onInputChange}
-                            fullWidth
-                            margin="normal"
-                        />
-                        <TextField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={onInputChange}
-                            fullWidth
-                            margin="normal"
-                        />
-                    </Box>
+                    <UserDetailsForm
+                        formData={formData}
+                        onInputChange={onInputChange}
+                        latLng={latLng}
+                    />
                 );
             case 1:
                 return (
-                    <Box>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>Select Satellite</InputLabel>
-                            <Select
-                                value={satellite}
-                                onChange={handleSatelliteChange}
-                                label="Satellite"
-                            >
-                                <MenuItem value="landsat9">Landsat 9</MenuItem>
-                                <MenuItem value="landsat8">Landsat 8</MenuItem>
-                                <MenuItem value="hsla">HSLA</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            label="Cloud Threshold"
-                            type="number"
-                            value={cloudThreshold}
-                            onChange={(e) => setCloudThreshold(e.target.value)}
-                            fullWidth
-                            margin="normal"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={mostRecentImage}
-                                    onChange={(e) => setMostRecentImage(e.target.checked)}
-                                    name="mostRecentImage"
-                                />
+                    <SatellitePropertiesForm
+                        satellite={satellite}
+                        cloudThreshold={cloudThreshold}
+                        mostRecentImage={mostRecentImage}
+                        metadata={metadata}
+                        dataValues={dataValues}
+                        spectralSignature={spectralSignature}
+                        dateRange={dateRange}
+                        onSatelliteChange={(e) => setSatellite(e.target.value as string)}
+                        onMostRecentChange={(e) => setMostRecentImage(e.target.checked)}
+                        onCheckboxChange={(e) => {
+                            switch (e.target.name) {
+                                case 'metadata':
+                                    setMetadata(e.target.checked);
+                                    break;
+                                case 'dataValues':
+                                    setDataValues(e.target.checked);
+                                    break;
+                                case 'spectralSignature':
+                                    setSpectralSignature(e.target.checked);
+                                    break;
                             }
-                            label="Most Recent Image"
-                        />
-                        {!mostRecentImage && (
-                            <TextField
-                                label="Date Range"
-                                type="date"
-                                value={dateRange}
-                                onChange={(e) => setDateRange(e.target.value)}
-                                fullWidth
-                                margin="normal"
-                            />
-                        )}
-                        <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={metadata}
-                                        onChange={handleCheckboxChange}
-                                        name="metadata"
-                                    />
-                                }
-                                label="Metadata"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={dataValues}
-                                        onChange={handleCheckboxChange}
-                                        name="dataValues"
-                                    />
-                                }
-                                label="Data Values"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={spectralSignature}
-                                        onChange={handleCheckboxChange}
-                                        name="spectralSignature"
-                                    />
-                                }
-                                label="Spectral Signature"
-                            />
-                        </FormGroup>
-                    </Box>
+                        }}
+                        onCloudThresholdChange={(e) => setCloudThreshold(e.target.value)}
+                        onDateRangeChange={(e) => setDateRange(e.target.value)}
+                    />
                 );
             default:
                 return 'Unknown step';
