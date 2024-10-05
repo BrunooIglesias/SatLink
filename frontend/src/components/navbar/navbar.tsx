@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 
 const Navbar: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
-
+    const router = useRouter();  
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
     };
@@ -10,6 +11,31 @@ const Navbar: React.FC = () => {
     const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
     };
+
+    if (router.pathname === '/image') {
+        return (
+            <nav style={{
+                backgroundColor: '#000',
+                color: '#fff',
+                padding: '1rem',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontFamily: "'Space Grotesk', sans-serif",
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '64px',
+                zIndex: 1000,
+                boxShadow: '0px 4px 2px -2px gray',
+            }}>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
+                    SatLink
+                </div>
+            </nav>
+        );
+    }
 
     return (
         <nav style={{
@@ -59,8 +85,6 @@ const Navbar: React.FC = () => {
                         fontWeight: 'bold',
                         transition: 'background-color 0.3s ease',
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#ddd')}
-                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
                 >
                     Go
                 </button>

@@ -75,7 +75,7 @@ const LandingPage: React.FC = () => {
   }, []);
 
   const goToHomePage = () => {
-    router.push('/home');
+    router.push('/map');
   };
 
   const title = "HOUSTON, WE HAVE A PROGRAM";
