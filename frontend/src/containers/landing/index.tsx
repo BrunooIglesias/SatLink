@@ -20,6 +20,8 @@ const LandingPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         color: 'white',
+        fontFamily: "'Space Grotesk', sans-serif", // Updated font
+        cursor: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🚀</text></svg>\") 16 0, auto", // Rocket emoji cursor
       }}
     >
       <Image
@@ -48,7 +50,7 @@ const LandingPage: React.FC = () => {
             fontWeight: 'bold',
             borderRadius: '0.5rem',
             border: 'none',
-            cursor: 'pointer',
+            cursor: 'inherit',
             transition: 'transform 0.3s ease, background-color 0.3s ease',
           }}
           onClick={goToHomePage}

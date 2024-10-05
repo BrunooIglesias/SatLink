@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="64" viewBox="0 0 24 24" width="64"><text y="32" font-size="32">🚀</text></svg>') 16 16, auto;
+}
