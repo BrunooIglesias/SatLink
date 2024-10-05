@@ -1,0 +1,17 @@
+# Use the official Node.js image as the base image
+FROM node:18
+
+# Set the working directory
+WORKDIR /app
+
+# Copy all files from the root to the working directory
+COPY . .
+
+# Install dependencies
+RUN npm install
+
+# Expose port 8080
+EXPOSE 8080
+
+# Run the Next.js development server
+CMD ["npm", "run", "dev"]
