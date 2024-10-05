@@ -1,0 +1,83 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+Thumbs.db   # Windows thumbnail cache
+*.pem
+*.log       # General log files
+*.lock      # Lock files
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Tailwind CSS
+public/css/   # Ignorar si Tailwind genera CSS aquí
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+
+# Linting
+.eslintcache
+
+# Docker
+docker-compose.yml
+Dockerfile
+
+# Test results
+/junit.xml
+/test-results/
+
+# Generated fonts
+*.ttf
+*.woff
+*.woff2
+
+# Static exports
+/static/
+
+# Build artifacts
+build-manifest.json
+prerender-manifest.json
+react-loadable-manifest.json
+
+# Temporary files
+*.tmp
+*.temp
+
+# CI/CD
+/.github/workflows/
+
+# Package manager specific
+package-lock.json
+yarn.lock
