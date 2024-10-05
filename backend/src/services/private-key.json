@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ee-santimoron001",
+  "private_key_id": "9a9af6ed040fd718c5e928f27d850f9db128f910",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiu4X241qtuKwp\nTFffXApGWiqGXwpwaWsbNXKUc3nqsd15AIt4JL2lq0HLt1KiobO8qrmbGoZ9GKYI\nKGKybnmdehJAXGm3fxHcqWPRgFVwR89/PumYcWUZdfG742oLM1iIBAxIsjUM8C7j\nzwnpwSjBhszTw63EeSMitJpAbYa3r5Fat521nah0e+oWk/VXrs95tzvBbryZRnIL\nR7NJbndU7Ggdb5mw8c1H5TXqUGWk1A49Wu024pj/g+Uw3HgUzDLPJvoonlDXO5lH\n/FCGV5cpyB4Gim8aylwMRIkEdn5HmIkfeaarZntNDR5pW5e/4yzajWk1gr5rSOju\n64OMPnsJAgMBAAECggEAE5PztmTdYKDQpORFtjDBZl/EykOMqDZCHGBaG315Ko3f\nPOKSKHartZF7JfcXeJmT5perXTxGHqkxNQUfuJ6Xe8SdrNcN/d1IEpDB4MY/Gmno\n/ejVzOcFvtQTYpD5iCwP2fbXhLN2pz5aHiuzhG68cTGNoD+GUq/PG+ESbLvIZTXn\nMArSxbcp+GxD1j6/Ewqw9PEr5wGUFyZnUZS5JsZCqUw6PPyRVAuOfGfM3r8OeC5/\nBE327nyRm2UjxhQRtkSNmNKFuMBwH8j5JWwbqPhRrsmjQFpEn8r6mhdE7IkHvvXH\nWF6gbdFHhc6UdAUqn9X0HaJospQr31udSxkFI8O+sQKBgQDz3IshMivRzeOPFkz4\np6pNmv0QA+c3eYr1BT7N4bgKu0oJ6TlbJFBL/XnDbY7ZB7J9pMHJlb5aefB7Oea7\nv5738KXaBv16P0fdswwyNagnZBLWz6ATKbLNI59jDFGtA0Y9BvHoRu8AmyqLBxgg\nEr8i8PAtTlOvvWcQvvkBfR6kLQKBgQDuBLXKhiltWyxchB5k+FFpUpM6bz8XEq57\n5LFT/R0vO4t/q47CnZmnp2pZWw6rdIJdTjpyL9gDtuV3qW38pTxBRqLZJBvvgmof\nctzMV0p7WSse3OoLJP9iKmGbmJqah5yEugevWnt9c1EUX+IWO/mnOPuKHpscF0OS\n2diH54vvzQKBgQCjMcph8sNkalaJITFtjjboLHqCRzpq44ncox/+g7m4ZNINg+iA\nV/Lsh7r+z8iy8PXAI4wULYPv5H7M2FjS+E+YOZGkMN1c/BBKC1J0H3hitBPvcY78\nhAFGSzqU/F+EWxacLJOjECVN0IlN9PduL11+MqNojmxuxV+90y+skWD6GQKBgDl6\nJbQ8ZbCkvbexp+1WEcLPUAJibufReRUuCqxviSaoyG0SLq1MhZh40zO0y3wX7Is/\notmEODPdbNhSr968wCo7NoQdNinGYn4prKwjwDa9N66CRnpeetVnyp5aYatDaEac\n7dIolX2b5U54QQ6BeS4qkoOuFGLaM1U5ChL3lVFZAoGBAJZ3YuN05vaC7DRCpv5+\nJpAJsUT+9CWhQAJ8RvuG3OdMbF+jV8KctAhFsYSwEi1igulC3Exb6KHlG5G6r68B\ny+UBk68NRlZY6i6973MFVd/rxO7JFiKXCCD0BaH9Kg7qtbkVRw4W+bUbMAuo39Ev\nq2g8/2obquvqfjpJk6wBtwj2\n-----END PRIVATE KEY-----\n",
+  "client_email": "landsat-service-account@ee-santimoron001.iam.gserviceaccount.com",
+  "client_id": "112032586887234743815",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/landsat-service-account%40ee-santimoron001.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
