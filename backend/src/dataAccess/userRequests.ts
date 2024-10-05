@@ -58,7 +58,7 @@ export async function insertResult(email,name,image){
   
 }
 
-export async function getUsersInRegion(regionCoordinates) {
+export async function getUsersInRegion(regionCoordinates, paramSatellite) {
   const connection = await mysql.createConnection({
     host: 'localhost',
             port: 3306,
@@ -68,11 +68,12 @@ export async function getUsersInRegion(regionCoordinates) {
         });
 
   try {
-    const [rows] = await connection.execute<[any[], any]>('SELECT id, email, coordinates FROM PendingRequests');
+    const [rows] = await connection.execute<[any[], any]>('SELECT id, email, coordinates FROM PendingRequests WHERE satellite = ?',
+      [paramSatellite]);
 
-    const usersInRegion: Array<{ id: number, email: string, coordinates: any }> = [];
+    const usersInRegion: Array<{ id: number, email: string, coordinates: any, satellite : string, cloudCover : number, dateFilters : JSON, metadata:JSON, dataValues:JSON, spectralSignature:JSON}> = [];
 
-    rows.forEach((row: { id: number, email: string, coordinates: string }) => {
+    rows.forEach((row: { id: number, email: string, coordinates: any, satellite : string, cloudCover : number, dateFilters : JSON, metadata:JSON, dataValues:JSON, spectralSignature:JSON}) => {
       const userCoordinates = JSON.parse(row.coordinates); // Assuming coordinates are stored as JSON in DB
 
       // Check if the user's coordinates are inside the region
@@ -81,17 +82,50 @@ export async function getUsersInRegion(regionCoordinates) {
           id: row.id,
           email: row.email,
           coordinates: userCoordinates,
+          satellite: row.satellite,
+          cloudCover: row.cloudCover,
+          dateFilters: row.dateFilters,
+          metadata: row.metadata,
+          dataValues: row.dataValues,
+          spectralSignature: row.spectralSignature
+
         });
       }
     });
 
-    return usersInRegion; // Return the list of users in the region
+    return usersInRegion;
 
   } catch (error) {
     console.error('Error querying the database:', error);
     throw error;
   } finally {
-    await connection.end(); // Close the connection
+    await connection.end();
+  }
+}
+export async function getResult(userParamId) {
+  const connection = await mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'your_user', // Replace with your MySQL username
+    password: 'your_password', // Replace with your MySQL password
+    database: 'your_database', // Replace with your MySQL database name
+  });
+
+  try {
+    // Query to select results where ID matches userParamId
+    const rows : any[] = await connection.execute('SELECT * FROM ResultsRequests WHERE id = ?', [userParamId]);
+    
+    if (rows.length === 0) {
+      console.log(`No results found for ID: ${userParamId}`);
+      return [];
+    }
+
+    return rows; // Return the results
+  } catch (error) {
+    console.error('Error fetching results:', error);
+    throw error; // Rethrow the error for further handling if necessary
+  } finally {
+    await connection.end(); // Close the database connection
   }
 }
 
@@ -108,4 +142,3 @@ function isPointInSquare(point, square) {
 
   return (lngP >= minLng && lngP <= maxLng) && (latP >= minLat && latP <= maxLat);
 }
-
