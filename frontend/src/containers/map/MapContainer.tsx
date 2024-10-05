@@ -3,7 +3,6 @@ import { useState } from "react";
 
 const MapComponent = dynamic(() => import("@/components/map/map"), { ssr: false });
 const UserDetailsPanel = dynamic(() => import("@/components/user-details-panel/UserDetailsPanel"), { ssr: false });
-import Navbar from "@/components/navbar/navbar";
 
 const MapContainer: React.FC = () => {
     const [latLng, setLatLng] = useState<{ lat: number; lng: number } | null>(null);
