@@ -61,14 +61,14 @@ export async function insertResult(email,name,image){
 export async function getUsersInRegion(regionCoordinates) {
   const connection = await mysql.createConnection({
     host: 'localhost',
-    port: 3306,
-    user: 'your_user',        
-    password: 'your_password',
-    database: 'your_database',
-  });
+            port: 3306,
+            user: 'myuser',
+            password: 'mypassword',
+            database: 'mydatabase',
+        });
 
   try {
-    const [rows] = await connection.execute<[any[], any]>('SELECT id, email, coordinates FROM UserRequest');
+    const [rows] = await connection.execute<[any[], any]>('SELECT id, email, coordinates FROM PendingRequests');
 
     const usersInRegion: Array<{ id: number, email: string, coordinates: any }> = [];
 

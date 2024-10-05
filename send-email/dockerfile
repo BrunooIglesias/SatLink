@@ -1,0 +1,31 @@
+# Use the official Python image from the Docker Hub
+FROM python:3.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install cron
+RUN apt-get update && apt-get install -y cron
+
+# Copy the requirements.txt and the script
+COPY requirements.txt requirements.txt
+COPY script.py script.py
+
+# Install the required packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the crontab file
+COPY crontab /etc/cron.d/email-cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/email-cron
+
+# Apply the cron job
+RUN crontab /etc/cron.d/email-cron
+
+# Create the log file for cron
+RUN touch /var/log/cron.log
+
+# Start the cron service
+CMD ["cron", "-f"]
+

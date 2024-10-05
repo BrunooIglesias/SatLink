@@ -15,5 +15,14 @@ services:
       - mysql-data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  email_sender:
+    image: email_sender
+    container_name: my_email_sender
+    depends_on:
+      - mysql  # Ensure MySQL starts before this service
+    environment:
+      MYSQL_HOST: mysql  # Set the MySQL hostname
+      MYSQL_PORT: 3306    # MySQL port
+
 volumes:
   mysql-data:

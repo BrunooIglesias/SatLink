@@ -17,9 +17,6 @@ class SatLogic {
             var ee = require('@google/earthengine');
             var fs = require('fs');
             console.log('Earth Engine client initialized.');
-            var region = ee.Geometry.Polygon([
-                [[-58.5, -34.5], [-58.5, -30.0], [-53.0, -30.0], [-53.0, -34.5]]
-            ]);
             var endDate = ee.Date(Date.now());
             var startDate = endDate.advance(-7, 'day');
             var collection = ee.ImageCollection(landsatCollection)
@@ -53,6 +50,7 @@ class SatLogic {
             var region = ee.Geometry.Polygon([
                 [[-58.5, -34.5], [-58.5, -30.0], [-53.0, -30.0], [-53.0, -34.5]]
             ]);
+            (0, userRequests_1.getUsersInRegion)(region);
             return [{ userMail: "santimoron001@gmail.com", coordinates: region, sat: satellite }];
         };
         this.generateData = (userData, satellite) => __awaiter(this, void 0, void 0, function* () {
@@ -100,6 +98,21 @@ class SatLogic {
                                             console.log("Image converted to JPEG: " + jpegFilePath);
                                             // Read the JPEG image into a buffer
                                             const imageBuffer = fs.readFileSync(jpegFilePath);
+                                            //SPECTRAL SIGNATURE
+                                            var geometry = collection.first().geometry();
+                                            var centroid = geometry.centroid();
+                                            var spectralValues = collection.first().reduceRegion({
+                                                reducer: ee.Reducer.first(),
+                                                geometry: centroid,
+                                                scale: 1000
+                                            }).getInfo();
+                                            console.log("Spectral values ", spectralValues);
+                                            //METADATA IN CSV FORMAT
+                                            collection.toDictionary().getInfo(function (metadata) {
+                                                var csvContent = convertMetadataToCSV(metadata);
+                                                fs.writeFileSync('landsat_image_metadata.csv', csvContent);
+                                                console.log('Metadata CSV saved as landsat_image_metadata.csv');
+                                            });
                                             // Insert the result into the database
                                             (0, userRequests_1.insertResult)(userData.userMail, userData.sat, imageBuffer);
                                             console.log("Result inserted correctly for: ", userData.userMail);
