@@ -18,12 +18,9 @@ interface SatellitePropertiesFormProps {
     metadata: boolean;
     dataValues: boolean;
     spectralSignature: boolean;
-    dateRange: string;
-    onSatelliteChange: (e: React.ChangeEvent<{ value: unknown }>) => void;
-    onMostRecentChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onCheckboxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onCloudThresholdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onDateRangeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    fromDate: string;
+    toDate: string;
+    onSatelliteChange: (key: string, value: any) => void;  // Updated to use key and value
 }
 
 const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
@@ -33,12 +30,9 @@ const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
                                                                              metadata,
                                                                              dataValues,
                                                                              spectralSignature,
-                                                                             dateRange,
+                                                                             fromDate,
+                                                                             toDate,
                                                                              onSatelliteChange,
-                                                                             onMostRecentChange,
-                                                                             onCheckboxChange,
-                                                                             onCloudThresholdChange,
-                                                                             onDateRangeChange
                                                                          }) => {
     return (
         <Box>
@@ -46,7 +40,7 @@ const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
                 <InputLabel>Select Satellite</InputLabel>
                 <Select
                     value={satellite}
-                    onChange={onSatelliteChange}
+                    onChange={(e) => onSatelliteChange('satellite', e.target.value)} // Update with key
                     label="Satellite"
                 >
                     <MenuItem value="landsat9">Landsat 9</MenuItem>
@@ -54,40 +48,55 @@ const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
                     <MenuItem value="hsla">HSLA</MenuItem>
                 </Select>
             </FormControl>
+
             <TextField
-                label="Cloud Threshold"
+                label="Cloud Threshold (0-100)"
                 type="number"
                 value={cloudThreshold}
-                onChange={onCloudThresholdChange}
+                onChange={(e) => onSatelliteChange('cloudThreshold', e.target.value)}  // Update with key
                 fullWidth
                 margin="normal"
+                inputProps={{ min: 0, max: 100 }} // Add input range
             />
+
             <FormControlLabel
                 control={
                     <Checkbox
                         checked={mostRecentImage}
-                        onChange={onMostRecentChange}
+                        onChange={(e) => onSatelliteChange('mostRecentImage', e.target.checked)}  // Update with key
                         name="mostRecentImage"
                     />
                 }
                 label="Most Recent Image"
             />
+
             {!mostRecentImage && (
-                <TextField
-                    label="Date Range"
-                    type="date"
-                    value={dateRange}
-                    onChange={onDateRangeChange}
-                    fullWidth
-                    margin="normal"
-                />
+                <Box>
+                    <TextField
+                        label="From Date"
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => onSatelliteChange('fromDate', e.target.value)}  // Update with key
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="To Date"
+                        type="date"
+                        value={toDate}
+                        onChange={(e) => onSatelliteChange('toDate', e.target.value)}  // Update with key
+                        fullWidth
+                        margin="normal"
+                    />
+                </Box>
             )}
+
             <FormGroup>
                 <FormControlLabel
                     control={
                         <Checkbox
                             checked={metadata}
-                            onChange={onCheckboxChange}
+                            onChange={(e) => onSatelliteChange('metadata', e.target.checked)}  // Update with key
                             name="metadata"
                         />
                     }
@@ -97,7 +106,7 @@ const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
                     control={
                         <Checkbox
                             checked={dataValues}
-                            onChange={onCheckboxChange}
+                            onChange={(e) => onSatelliteChange('dataValues', e.target.checked)}  // Update with key
                             name="dataValues"
                         />
                     }
@@ -107,7 +116,7 @@ const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
                     control={
                         <Checkbox
                             checked={spectralSignature}
-                            onChange={onCheckboxChange}
+                            onChange={(e) => onSatelliteChange('spectralSignature', e.target.checked)}  // Update with key
                             name="spectralSignature"
                         />
                     }

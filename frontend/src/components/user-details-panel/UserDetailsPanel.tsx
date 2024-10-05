@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-    Button,
-    Box,
-    Paper,
-    Stepper,
-    Step,
-    StepLabel
-} from "@mui/material";
+import { Button, Box, Paper, Stepper, Step, StepLabel } from "@mui/material";
 import UserDetailsForm from "@/components/user-details-panel/components/UserDetailsForm";
 import SatellitePropertiesForm from "@/components/user-details-panel/components/SatellitePropertiesForm";
 
@@ -17,6 +10,8 @@ interface UserDetailsPanelProps {
     onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
     latLng: { lat: number; lng: number } | null;
+    satelliteData: any;
+    onSatelliteChange: (key: string, value: any) => void;
 }
 
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
@@ -26,15 +21,10 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                                                                onInputChange,
                                                                onSubmit,
                                                                latLng,
+                                                               satelliteData,
+                                                               onSatelliteChange
                                                            }) => {
     const [activeStep, setActiveStep] = useState(0);
-    const [satellite, setSatellite] = useState('');
-    const [cloudThreshold, setCloudThreshold] = useState('');
-    const [mostRecentImage, setMostRecentImage] = useState(true);
-    const [metadata, setMetadata] = useState(false);
-    const [dataValues, setDataValues] = useState(false);
-    const [spectralSignature, setSpectralSignature] = useState(false);
-    const [dateRange, setDateRange] = useState('');
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -44,7 +34,7 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
-    const steps = ['Personal Details', 'Satellite Properties'];
+    const steps = ["Personal Details", "Satellite Properties"];
 
     const renderStepContent = (step: number) => {
         switch (step) {
@@ -59,34 +49,19 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
             case 1:
                 return (
                     <SatellitePropertiesForm
-                        satellite={satellite}
-                        cloudThreshold={cloudThreshold}
-                        mostRecentImage={mostRecentImage}
-                        metadata={metadata}
-                        dataValues={dataValues}
-                        spectralSignature={spectralSignature}
-                        dateRange={dateRange}
-                        onSatelliteChange={(e) => setSatellite(e.target.value as string)}
-                        onMostRecentChange={(e) => setMostRecentImage(e.target.checked)}
-                        onCheckboxChange={(e) => {
-                            switch (e.target.name) {
-                                case 'metadata':
-                                    setMetadata(e.target.checked);
-                                    break;
-                                case 'dataValues':
-                                    setDataValues(e.target.checked);
-                                    break;
-                                case 'spectralSignature':
-                                    setSpectralSignature(e.target.checked);
-                                    break;
-                            }
-                        }}
-                        onCloudThresholdChange={(e) => setCloudThreshold(e.target.value)}
-                        onDateRangeChange={(e) => setDateRange(e.target.value)}
+                        satellite={satelliteData.satellite}
+                        cloudThreshold={satelliteData.cloudThreshold}
+                        mostRecentImage={satelliteData.mostRecentImage}
+                        metadata={satelliteData.metadata}
+                        dataValues={satelliteData.dataValues}
+                        spectralSignature={satelliteData.spectralSignature}
+                        fromDate={satelliteData.fromDate}
+                        toDate={satelliteData.toDate}
+                        onSatelliteChange={(key, value) => onSatelliteChange(key, value)}
                     />
                 );
             default:
-                return 'Unknown step';
+                return "Unknown step";
         }
     };
 
@@ -116,17 +91,21 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                 ))}
             </Stepper>
 
-            <Box sx={{ flexGrow: 1, mt: 2 }}>
-                {renderStepContent(activeStep)}
-            </Box>
+            <Box sx={{ flexGrow: 1, mt: 2 }}>{renderStepContent(activeStep)}</Box>
 
-            <Box sx={{ display: 'flex', justifyContent: activeStep > 0 ? 'space-between' : 'center', mt: 2 }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: activeStep > 0 ? "space-between" : "center",
+                    mt: 2,
+                }}
+            >
                 {activeStep > 0 && (
                     <Button
                         variant="contained"
                         color="secondary"
                         onClick={handleBack}
-                        sx={{ width: '48%' }}
+                        sx={{ width: "48%" }}
                     >
                         Back
                     </Button>
@@ -135,7 +114,7 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                     <Button
                         variant="contained"
                         onClick={handleNext}
-                        sx={{ width: activeStep > 0 ? '48%' : '100%' }}
+                        sx={{ width: activeStep > 0 ? "48%" : "100%" }}
                     >
                         Next
                     </Button>
@@ -143,14 +122,14 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                     <Button
                         variant="contained"
                         onClick={onSubmit}
-                        sx={{ width: '48%' }}
+                        sx={{ width: "48%" }}
                     >
                         Submit
                     </Button>
                 )}
             </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                 <Button variant="text" color="secondary" onClick={onClose} fullWidth>
                     Close
                 </Button>
