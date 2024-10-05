@@ -27,6 +27,8 @@ services:
   front_end:
     image: front_end
     container_name: my_front_end
+    ports:
+      - "8000:8000"
 
 volumes:
   mysql-data:
