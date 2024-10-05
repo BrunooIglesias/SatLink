@@ -1,5 +1,6 @@
-import HomeContainer from "@/containers/home/HomeContainer";
+import LandingPage from "@/containers/landing";
+
 
 export default function Home() {
-    return <HomeContainer />;
+    return <LandingPage />;
 }
