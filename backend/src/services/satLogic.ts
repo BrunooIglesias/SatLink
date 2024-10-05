@@ -32,7 +32,7 @@ export class SatLogic {
   }
 
   checkSats = async () => {
-    let satellites : string[] = ["LANDSAT/LC09/C02/T1_L2"] // , ["LANDSAT/LC08/C02/T1_L2", "NASA/HLS/HLSL30/v002"];
+    let satellites : string[] = ["LANDSAT/LC09/C02/T1_L2","LANDSAT/LC08/C02/T1_L2", "NASA/HLS/HLSL30/v002"];
 
     for (let i = 0; i < satellites.length; i++) {
       await this.checkAndSendPictures(satellites[i]);
@@ -42,20 +42,20 @@ export class SatLogic {
   checkAndSendPictures = async (satellite) => {
     let coordinates = await this.getSatelliteLocation(satellite);
     console.log("Coordinates of " + satellite + ": ", coordinates);
-    let usersData = this.getInterestedUsers(coordinates, satellite);
+    let usersData = await this.getInterestedUsers(coordinates, satellite);
+    if (usersData.length == 0) {
+      console.log("No users found for satellite: ", satellite);
+    }
     for (let i = 0; i < usersData.length; i++) {
       this.generateData(usersData[i], satellite);
     }
   }
     
 
-   getInterestedUsers = (coordinates: void, satellite:string) => {
+   getInterestedUsers = async (coordinates: void, satellite:string) => {
     var ee = require('@google/earthengine');
-      var region = ee.Geometry.Polygon([
-        [[-58.5, -34.5], [-58.5, -30.0], [-53.0, -30.0], [-53.0, -34.5]]
-      ]);
-      getUsersInRegion(region);
-      return [{userMail:"santimoron001@gmail.com", coordinates:region, sat: satellite }];
+      let InterestedUsers = getUsersInRegion(coordinates, satellite);
+      return InterestedUsers;
     }
 
     generateData = async (userData, satellite) => {
@@ -71,14 +71,18 @@ export class SatLogic {
           ee.data.authenticateViaPrivateKey(privateKey, function() {
               ee.initialize(null, null, function() {
                   console.log('Earth Engine client initialized.');
-                  const endDate = ee.Date(Date.now());
-                  const startDate = endDate.advance(-20, 'day');
-  
+                  let endDate = ee.Date(Date.now());
+                  let startDate = endDate.advance(-20, 'day');
+                  if (userData.dateFilters) {
+                      endDate = ee.Date(userData.dateFilters.endDate);
+                      startDate = ee.Date(userData.dateFilters.startDate);
+                  }
                   //GET PICTURE
                   const collection = ee.ImageCollection(satellite)
                       .filterDate(startDate, endDate)
                       .filterBounds(userData.coordinates)
-                      .sort('system:time_start', false);
+                      .sort('system:time_start', false)
+                      .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover));;
   
                   const mosaic = collection.mosaic(); // Usar mosaic para combinar imágenes
   
@@ -115,6 +119,7 @@ export class SatLogic {
                                   const imageBuffer = fs.readFileSync(jpegFilePath);
                                   
                                     //SPECTRAL SIGNATURE
+                                  if (userData.spectralSignature) {
                                     var geometry = collection.first().geometry();
                                     var centroid = geometry.centroid(); 
                                     var spectralValues = collection.first().reduceRegion({
@@ -124,15 +129,16 @@ export class SatLogic {
                                     }).getInfo();
                                 
                                     console.log("Spectral values ", spectralValues); 
-
+                                  }
 
                                     //METADATA IN CSV FORMAT
-                                    
+                                  if (userData.metadata) {
                                     collection.toDictionary().getInfo(function(metadata) {
                                       var csvContent = convertMetadataToCSV(metadata);
                                       fs.writeFileSync('landsat_image_metadata.csv', csvContent);
                                       console.log('Metadata CSV saved as landsat_image_metadata.csv');
                                     });
+                                  }
                                   // Insert the result into the database
                                   insertResult(userData.userMail, userData.sat, imageBuffer);
                                 
