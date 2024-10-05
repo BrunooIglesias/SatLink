@@ -36,7 +36,7 @@ export async function insertRequest(email, name, coordinates, satellite) {
   });
     const resultsRequestQuery = `
         INSERT INTO ResultsRequests (email, name, image) 
-        VALUES (?, ?, FROM_BASE64(?))`;
+        VALUES (?, ?, ?)`;
     try{
       await connection.execute(resultsRequestQuery, [
           email,
