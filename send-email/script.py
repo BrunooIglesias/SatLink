@@ -97,7 +97,7 @@ def mark_as_sent(request_id):
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
 
-        query = "UPDATE ResultsRequests SET sent = 0 WHERE id = %s;"
+        query = "UPDATE ResultsRequests SET sent = 1 WHERE id = %s;"
         cursor.execute(query, (request_id,))
         conn.commit()
 

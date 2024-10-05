@@ -1,30 +1,19 @@
-import localFont from "next/font/local";
-import "../../public/globals.css"; // Adjust the path accordingly
+import { useRouter } from 'next/router';
 
-const geistSans = localFont({
-    src: "./fonts/GeistVF.woff",
-    variable: "--font-geist-sans",
-    weight: "100 900",
-});
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+    const router = useRouter();
+    const shouldShowHeader = router.pathname !== '/';
 
-const geistMono = localFont({
-    src: "./fonts/GeistMonoVF.woff",
-    variable: "--font-geist-mono",
-    weight: "100 900",
-});
-
-export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
-    children: React.ReactNode;
-}>) {
     return (
-        <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}
-        >
-        <div className="h-full">{children}</div>
-        </body>
-        </html>
+        <>
+            <div className="antialiased h-screen">
+                {shouldShowHeader && (
+                    <header className="bg-gray-800 text-white text-center py-4 z-10">
+                        <h1 className="text-2xl font-bold">Get your Landsat img!</h1>
+                    </header>
+                )}
+                <main className="h-full">{children}</main>
+            </div>
+        </>
     );
 }
