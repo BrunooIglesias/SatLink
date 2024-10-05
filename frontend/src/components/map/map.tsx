@@ -26,7 +26,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ onMapClick }) => {
             const map = L.map('map', {
                 center: [40, -100],
                 zoom: 4,
-                zoomControl: true,
+                zoomControl: false,
                 attributionControl: false,
             });
 
