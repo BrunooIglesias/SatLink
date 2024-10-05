@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "../../../public/globals.css";
+import "../../public/globals.css"; // Adjust the path accordingly
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
     variable: "--font-geist-sans",
     weight: "100 900",
 });
+
 const geistMono = localFont({
     src: "./fonts/GeistMonoVF.woff",
     variable: "--font-geist-mono",
