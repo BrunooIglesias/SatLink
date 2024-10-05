@@ -141,6 +141,7 @@ function getResult(userParamId) {
     });
 }
 function isPointInSquare(point, square) {
+    return true;
     const [lngP, latP] = point;
     const lats = square.map(coord => coord[1]); // Get latitudes from square
     const lngs = square.map(coord => coord[0]); // Get longitudes from square

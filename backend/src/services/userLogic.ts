@@ -21,12 +21,17 @@ export class UserLogic {
         [coordinates[0] - 0.1, coordinates[1] - 0.1]
       ];
 
+      const formattedCoordinatesBox = coordinatesBox.map(([lat, lon]) => ({
+        lat: lat,
+        lon: lon
+      }));
+
       const dateFilters = { startDate: landsatCollection.fromDate, endDate: landsatCollection.toDate };
 
       await insertRequest(
         landsatCollection.email,
         landsatCollection.name,
-        coordinatesBox,  // Updated this to use the surrounding coordinates
+        formattedCoordinatesBox,  // Updated this to use the surrounding coordinates
         landsatCollection.satellite,
         landsatCollection.cloudThreshold,
         dateFilters,

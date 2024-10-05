@@ -18,18 +18,21 @@ class SatLogic {
             var fs = require('fs');
             console.log('Earth Engine client initialized.');
             var endDate = ee.Date(Date.now());
-            var startDate = endDate.advance(-7, 'day');
+            var startDate = endDate.advance(-30, 'day');
             var collection = ee.ImageCollection(landsatCollection)
                 .filterDate(startDate, endDate);
             var latestImage = collection.sort('system:time_start', false).first();
-            var imageDate = latestImage.getInfo().properties.DATE_ACQUIRED;
-            var imageTime = latestImage.getInfo().properties.SCENE_CENTER_TIME;
-            console.log('Fecha y hora de foto más reciente:', imageDate, imageTime);
-            var geometry = latestImage.geometry();
-            var centroid = geometry.centroid();
-            var centroidCoordinates = centroid.coordinates().getInfo(); // Obtener información del centro
-            console.log('Centro de la imagen:', centroidCoordinates);
-            return centroidCoordinates;
+            if (latestImage) {
+                var imageDate = latestImage.getInfo().properties.DATE_ACQUIRED;
+                var imageTime = latestImage.getInfo().properties.SCENE_CENTER_TIME;
+                console.log('Fecha y hora de foto más reciente:', imageDate, imageTime);
+                var geometry = latestImage.geometry();
+                var centroid = geometry.centroid();
+                var centroidCoordinates = centroid.coordinates().getInfo(); // Obtener información del centro
+                console.log('Centro de la imagen:', centroidCoordinates);
+                return centroidCoordinates;
+            }
+            return null;
         });
         this.checkSats = () => __awaiter(this, void 0, void 0, function* () {
             let satellites = ["LANDSAT/LC09/C02/T1_L2", "LANDSAT/LC08/C02/T1_L2", "NASA/HLS/HLSL30/v002"];

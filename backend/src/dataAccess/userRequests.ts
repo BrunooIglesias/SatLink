@@ -133,6 +133,7 @@ export async function getResult(userParamId) {
 }
 
 function isPointInSquare(point, square) {
+  return true;
   const [lngP, latP] = point;
 
   const lats = square.map(coord => coord[1]); // Get latitudes from square

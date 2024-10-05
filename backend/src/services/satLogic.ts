@@ -13,12 +13,13 @@ export class SatLogic {
 
 
       var endDate = ee.Date(Date.now());
-      var startDate = endDate.advance(-7, 'day');
+      var startDate = endDate.advance(-30, 'day');
 
       var collection = ee.ImageCollection(landsatCollection)
                           .filterDate(startDate, endDate)
       var latestImage = collection.sort('system:time_start', false).first();
 
+      if(latestImage) {
       var imageDate = latestImage.getInfo().properties.DATE_ACQUIRED;
       var imageTime = latestImage.getInfo().properties.SCENE_CENTER_TIME
       console.log('Fecha y hora de foto más reciente:', imageDate, imageTime);
@@ -29,6 +30,8 @@ export class SatLogic {
       console.log('Centro de la imagen:', centroidCoordinates);
 
       return centroidCoordinates;
+      }
+      return null;
   }
 
   checkSats = async () => {
