@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -7,11 +7,11 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ onMapClick }) => {
-    useEffect(() => {
-        let map: L.Map | undefined;
+    const mapRef = useRef<L.Map | null>(null);
 
-        if (!map) {
-            map = L.map('map', {
+    useEffect(() => {
+        if (mapRef.current === null) {
+            const map = L.map('map', {
                 center: [40, -100],
                 zoom: 4,
                 zoomControl: true,
@@ -26,16 +26,14 @@ const MapComponent: React.FC<MapComponentProps> = ({ onMapClick }) => {
             map.on('click', function (e: any) {
                 const { lat, lng } = e.latlng;
                 onMapClick(lat, lng);
+
+                map.setView([lat, lng], map.getZoom());
             });
 
             map.getContainer().style.cursor = 'url(https://maps.gstatic.com/mapfiles/openhand_8_8.cur), default';
-        }
 
-        return () => {
-            if (map) {
-                map.remove();
-            }
-        };
+            mapRef.current = map;
+        }
     }, [onMapClick]);
 
     return (
