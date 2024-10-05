@@ -140,7 +140,7 @@ export class SatLogic {
                                     });
                                   }
                                   // Insert the result into the database
-                                  insertResult(userData.userMail, userData.sat, imageBuffer);
+                                  insertResult(userData.userMail, userData.sat, imageBuffer, userData.metadata, userData.dataValues, userData.spectralSignature);
                                 
                                   console.log("Result inserted correctly for: ", userData.userMail);
                                   resolve();

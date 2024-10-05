@@ -32,7 +32,7 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
     catch (error) {
     }
 }
-export async function insertResult(email,name,image){
+export async function insertResult(email,name,image, metadata, dataValues, spectralSignature) {
     const connection = await mysql.createConnection({
       host: 'localhost',
       port: 3306,
@@ -41,8 +41,8 @@ export async function insertResult(email,name,image){
       database: 'mydatabase', // Replace with your MySQL database name
   });
     const resultsRequestQuery = `
-        INSERT INTO ResultsRequests (email, name, image) 
-        VALUES (?, ?, ?)`;
+        INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature) 
+        VALUES (?, ?, ?, ?, ?, ?)`;
     try{
       await connection.execute(resultsRequestQuery, [
           email,
