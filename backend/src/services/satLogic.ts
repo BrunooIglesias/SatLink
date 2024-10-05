@@ -136,7 +136,7 @@ export class SatLogic {
                 console.log('Metadata CSV saved as landsat_image_metadata.csv');
               });
 
-              insertResult(userData.userMail, userData.sat,  base64String);
+              //insertResult(userData.userMail, userData.sat, spectralValues,  base64String);
               console.log("Result inserted correctly: ", base64String);
             });
           
