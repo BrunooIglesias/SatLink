@@ -1,7 +1,7 @@
+import dynamic from 'next/dynamic';
 import { useState } from "react";
-import dynamic from "next/dynamic";
-import MapComponent from "@/components/map/map";
 
+const MapComponent = dynamic(() => import("@/components/map/map"), { ssr: false });
 const UserDetailsPanel = dynamic(() => import("@/components/user-details-panel/UserDetailsPanel"), { ssr: false });
 
 const MapContainer: React.FC = () => {
