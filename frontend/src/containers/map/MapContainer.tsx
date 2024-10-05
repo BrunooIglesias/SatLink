@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import { useState } from "react";
+import {createUserRequest} from "@/api-flows/userRequest";
 
 const MapComponent = dynamic(() => import("@/components/map/map"), { ssr: false });
 const UserDetailsPanel = dynamic(() => import("@/components/user-details-panel/UserDetailsPanel"), { ssr: false });
@@ -37,7 +38,7 @@ const MapContainer: React.FC = () => {
         setSatelliteData(prev => ({ ...prev, [key]: value }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const data = {
             latitude: latLng?.lat,
             longitude: latLng?.lng,
@@ -53,9 +54,14 @@ const MapContainer: React.FC = () => {
             toDate: satelliteData.toDate,
         }
 
-        alert(JSON.stringify(data))
+        try {
+            const response = await createUserRequest(data);
+            console.log('Response from API:', response);
 
-        setIsPanelOpen(false);
+            setIsPanelOpen(false);
+        } catch (error) {
+            console.error('Error submitting user request:', error);
+        }
     };
 
     return (
