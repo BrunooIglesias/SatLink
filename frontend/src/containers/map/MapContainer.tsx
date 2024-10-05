@@ -1,5 +1,6 @@
 import { useState } from "react";
 import MapComponent from "@/components/map/map";
+import Navbar from "@/components/navbar/navbar";
 
 const MapContainer: React.FC = () => {
     const [latLng, setLatLng] = useState<{ lat: number; lng: number } | null>(null);
@@ -11,9 +12,7 @@ const MapContainer: React.FC = () => {
 
     return (
         <div className="flex flex-col h-screen">
-            <header className="bg-gray-800 text-white text-center py-4">
-                <h1 className="text-2xl font-bold">Get your Landsat img!</h1>
-            </header>
+           <Navbar/>
 
             <div className="flex-1">
                 <MapComponent onMapClick={handleMapClick} />
