@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const createUserRequest = async (data: any) => {
     try {
-        const response = await axios.post('/userRequest', data, {
+        const response = await axios.post('http://localhost:3000/userRequest', data, {
             headers: {
                 'Content-Type': 'application/json',
             },
