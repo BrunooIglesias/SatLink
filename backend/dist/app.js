@@ -14,9 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const satLogic_1 = require("./services/satLogic");
+const axios_1 = __importDefault(require("axios"));
+const userLogic_1 = require("./services/userLogic");
 const app = (0, express_1.default)();
 const port = 3000;
+let cors = require('cors');
+app.use(express_1.default.json());
+app.use(cors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+}));
 const _satLogic = new satLogic_1.SatLogic();
+const _userLogic = new userLogic_1.UserLogic();
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
@@ -24,6 +34,15 @@ app.get('/checkSatellites', (req, res) => __awaiter(void 0, void 0, void 0, func
     yield initializeEE();
     yield _satLogic.checkSats();
     res.status(200).json("Satellites checked");
+}));
+app.get('/results/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield _userLogic.getResults(req.params.id);
+    res.status(200).json("Satellites checked");
+}));
+app.post('/userRequest', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let request = req.body;
+    yield _userLogic.createRequest(request);
+    res.status(200).json("Request created");
 }));
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Express is listening at http://localhost:${port}`);
@@ -47,5 +66,21 @@ const initializeEE = () => __awaiter(void 0, void 0, void 0, function* () {
             reject(e);
         });
     });
+});
+function checkForImages() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const response = yield axios_1.default.get('http://localhost:${port}/checkSatellites');
+            console.log('Satellites checked successfully:', response.data);
+        }
+        catch (error) {
+            console.error('Error checking satellites:', error);
+        }
+    });
+}
+const cron = require('node-cron');
+cron.schedule('0 */12 * * *', () => {
+    console.log('Running cron job to check satellites...');
+    checkForImages();
 });
 //# sourceMappingURL=app.js.map

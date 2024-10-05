@@ -48,7 +48,7 @@ const MapContainer: React.FC = () => {
             cloudThreshold: satelliteData.cloudThreshold,
             mostRecent: satelliteData.mostRecentImage,
             metadata: satelliteData.metadata,
-            dateValues: satelliteData.dataValues,
+            dataValues: satelliteData.dataValues,
             spectralSignature: satelliteData.spectralSignature,
             fromDate: satelliteData.fromDate,
             toDate: satelliteData.toDate,

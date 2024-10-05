@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertRequest = insertRequest;
 exports.insertResult = insertResult;
 exports.getUsersInRegion = getUsersInRegion;
+exports.getResult = getResult;
 const promise_1 = __importDefault(require("mysql2/promise"));
 function insertRequest(email, name, coordinates, satellite, cloudCover, dateFilters, metadata, dataValues, spectralSignature) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -43,10 +44,11 @@ function insertRequest(email, name, coordinates, satellite, cloudCover, dateFilt
             console.log('Inserted into PendingRequests successfully.');
         }
         catch (error) {
+            console.log('Error inserting data:', error, 'Data received: ', email, name, coordinates, satellite, cloudCover, dateFilters, metadata, dataValues, spectralSignature);
         }
     });
 }
-function insertResult(email, name, image) {
+function insertResult(email, name, image, metadata, dataValues, spectralSignature) {
     return __awaiter(this, void 0, void 0, function* () {
         const connection = yield promise_1.default.createConnection({
             host: 'localhost',
@@ -56,8 +58,8 @@ function insertResult(email, name, image) {
             database: 'mydatabase', // Replace with your MySQL database name
         });
         const resultsRequestQuery = `
-        INSERT INTO ResultsRequests (email, name, image) 
-        VALUES (?, ?, ?)`;
+        INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature) 
+        VALUES (?, ?, ?, ?, ?, ?)`;
         try {
             yield connection.execute(resultsRequestQuery, [
                 email,
@@ -71,7 +73,7 @@ function insertResult(email, name, image) {
         }
     });
 }
-function getUsersInRegion(regionCoordinates) {
+function getUsersInRegion(regionCoordinates, paramSatellite) {
     return __awaiter(this, void 0, void 0, function* () {
         const connection = yield promise_1.default.createConnection({
             host: 'localhost',
@@ -81,7 +83,7 @@ function getUsersInRegion(regionCoordinates) {
             database: 'mydatabase',
         });
         try {
-            const [rows] = yield connection.execute('SELECT id, email, coordinates FROM PendingRequests');
+            const [rows] = yield connection.execute('SELECT id, email, coordinates FROM PendingRequests WHERE satellite = ?', [paramSatellite]);
             const usersInRegion = [];
             rows.forEach((row) => {
                 const userCoordinates = JSON.parse(row.coordinates); // Assuming coordinates are stored as JSON in DB
@@ -91,17 +93,50 @@ function getUsersInRegion(regionCoordinates) {
                         id: row.id,
                         email: row.email,
                         coordinates: userCoordinates,
+                        satellite: row.satellite,
+                        cloudCover: row.cloudCover,
+                        dateFilters: row.dateFilters,
+                        metadata: row.metadata,
+                        dataValues: row.dataValues,
+                        spectralSignature: row.spectralSignature
                     });
                 }
             });
-            return usersInRegion; // Return the list of users in the region
+            return usersInRegion;
         }
         catch (error) {
             console.error('Error querying the database:', error);
             throw error;
         }
         finally {
-            yield connection.end(); // Close the connection
+            yield connection.end();
+        }
+    });
+}
+function getResult(userParamId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const connection = yield promise_1.default.createConnection({
+            host: 'localhost',
+            port: 3306,
+            user: 'your_user', // Replace with your MySQL username
+            password: 'your_password', // Replace with your MySQL password
+            database: 'your_database', // Replace with your MySQL database name
+        });
+        try {
+            // Query to select results where ID matches userParamId
+            const rows = yield connection.execute('SELECT * FROM ResultsRequests WHERE id = ?', [userParamId]);
+            if (rows.length === 0) {
+                console.log(`No results found for ID: ${userParamId}`);
+                return [];
+            }
+            return rows; // Return the results
+        }
+        catch (error) {
+            console.error('Error fetching results:', error);
+            throw error; // Rethrow the error for further handling if necessary
+        }
+        finally {
+            yield connection.end(); // Close the database connection
         }
     });
 }

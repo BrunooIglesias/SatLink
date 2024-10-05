@@ -29,9 +29,15 @@ CREATE TABLE `PendingRequests` (
   `email` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `coordinates` json NOT NULL,
+  `cloudCover` int DEFAULT NULL,
+  `dateFilters` json DEFAULT NULL,
+  `metadata` varchar(1) DEFAULT NULL,
+  `dataValues` varchar(1) DEFAULT NULL,
+  `spectralSignature` varchar(1) DEFAULT NULL,
+  `satellite` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `PendingRequests_chk_1` CHECK (((json_length(`coordinates`) = 4) and (json_extract(`coordinates`,_utf8mb4'$[0]') is not null) and (json_extract(`coordinates`,_utf8mb4'$[1]') is not null) and (json_extract(`coordinates`,_utf8mb4'$[2]') is not null) and (json_extract(`coordinates`,_utf8mb4'$[3]') is not null)))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +46,7 @@ CREATE TABLE `PendingRequests` (
 
 LOCK TABLES `PendingRequests` WRITE;
 /*!40000 ALTER TABLE `PendingRequests` DISABLE KEYS */;
-INSERT INTO `PendingRequests` VALUES (1,'john.doe@example.com','John Doe','[{\"lat\": 40.7128, \"lon\": -74.006}, {\"lat\": 34.0522, \"lon\": -118.2437}, {\"lat\": 51.5074, \"lon\": -0.1278}, {\"lat\": 35.6895, \"lon\": 139.6917}]');
+INSERT INTO `PendingRequests` VALUES (1,'john.doe@example.com','John Doe','[{\"lat\": 40.7128, \"lon\": -74.006}, {\"lat\": 34.0522, \"lon\": -118.2437}, {\"lat\": 51.5074, \"lon\": -0.1278}, {\"lat\": 35.6895, \"lon\": 139.6917}]',NULL,NULL,NULL,NULL,NULL,''),(2,'santiagosalinasoto@gmail.com','Santiago','[[-34.49704151614416, -56.325781250000006], [-34.69704151614416, -56.325781250000006], [-34.49704151614416, -56.52578125000001], [-34.69704151614416, -56.52578125000001]]',0,'{\"endDate\": \"\", \"startDate\": \"\"}','1','1','1','landsat9');
 /*!40000 ALTER TABLE `PendingRequests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,4 +89,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-05 19:02:23
+-- Dump completed on 2024-10-05 19:45:45

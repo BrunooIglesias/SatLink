@@ -10,6 +10,8 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
           password: 'mypassword',
           database: 'mydatabase', 
       });
+
+
         const pendingRequestQuery = `
             INSERT INTO PendingRequests (email, name, coordinates, satellite, cloudCover, dateFilters, metadata, dataValues, spectralSignature) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -19,7 +21,7 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
           name,
           coordinates,
           satellite,
-          cloudCover, 
+          cloudCover,
           dateFilters,
           metadata,
           dataValues,
@@ -30,6 +32,7 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
         console.log('Inserted into PendingRequests successfully.');
       }
     catch (error) {
+      console.log('Error inserting data:', error, 'Data received: ', email, name, coordinates, satellite, cloudCover, dateFilters, metadata, dataValues, spectralSignature);
     }
 }
 export async function insertResult(email,name,image, metadata, dataValues, spectralSignature) {
