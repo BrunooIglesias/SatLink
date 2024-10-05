@@ -1,6 +1,10 @@
 import React from 'react';
 
-const Graph: React.FC = () => {
+interface GraphProps {
+    data: any;
+}
+
+const Graph: React.FC<GraphProps> = ({ data }) => {
     return (
         <div style={{
             width: '100%',

@@ -1,6 +1,10 @@
 import React from 'react';
 
-const SatelliteImage: React.FC = () => {
+interface SatelliteImageProps {
+    src: string;
+}
+
+const SatelliteImage: React.FC<SatelliteImageProps> = ({ src }) => {
     return (
         <div style={{
             width: '100%',
@@ -11,7 +15,7 @@ const SatelliteImage: React.FC = () => {
             alignItems: 'center',
             marginBottom: '20px'
         }}>
-            [Satellite Image Placeholder]
+            <img src={src} alt="Satellite" style={{ maxWidth: '100%', maxHeight: '100%' }} />
         </div>
     );
 };
