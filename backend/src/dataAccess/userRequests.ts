@@ -122,7 +122,7 @@ export async function getResult(userParamId) {
 
   try {
 
-    const rows : any[] = await connection.execute('SELECT dataValues,SpectralSignature,ImageFile FROM ResultsRequests WHERE id = ?', [userParamId]);
+    const rows : any[] = await connection.execute('SELECT dataValues,SpectralSignature,image FROM ResultsRequests WHERE id = ?', [userParamId]);
     
     if (rows.length === 0) {
       console.log(`No results found for ID: ${userParamId}`);
