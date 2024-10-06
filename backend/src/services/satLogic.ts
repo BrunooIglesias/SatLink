@@ -169,16 +169,6 @@ export class SatLogic {
                                   }
 
 
-
-                                  // Get the Path and Row from the filtered result
-                                  var path = "";
-                                  var row = "";
-                                  await collection.toDictionary().getInfo(await function(metadata) {
-                                    console.log("Metadata:", metadata);
-                                      path = metadata.WRS_PATH;
-                                      row = metadata.WRS_ROW;
-                                  });
-
                                   return imageBuffer;
                                   resolve();
                               } catch (error) {
@@ -193,6 +183,18 @@ export class SatLogic {
               });
           });
       });
+  }
+
+  getPathRow = async (collection)=>{
+    // Get the Path and Row from the filtered result
+    var path = "";
+    var row = "";
+    await collection.toDictionary().getInfo(await function(metadata) {
+      console.log("Metadata:", metadata);
+        path = metadata.WRS_PATH;
+        row = metadata.WRS_ROW;
+    });
+    return {"path": path, "row":row};
   }
   
     
