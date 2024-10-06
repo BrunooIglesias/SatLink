@@ -8,11 +8,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <div className="antialiased min-h-screen flex flex-col">
             {shouldShowHeader && (
-                <header>
+                <header className="fixed w-full top-0 z-50">
                     <Navbar />
                 </header>
             )}
-            <main className="flex-1 mt-16">
+            <main className="flex-1" style={{ paddingTop: '64px' }}>
                 {children}
             </main>
         </div>
