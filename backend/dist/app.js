@@ -36,13 +36,34 @@ app.get('/checkSatellites', (req, res) => __awaiter(void 0, void 0, void 0, func
     res.status(200).json("Satellites checked");
 }));
 app.get('/results/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield _userLogic.getResults(req.params.id);
-    res.status(200).json("Satellites checked");
+    let result = yield _userLogic.getResults(req.params.id);
+    res.status(200).json(result[0][0]);
 }));
 app.post('/userRequest', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let request = req.body;
     yield _userLogic.createRequest(request);
     res.status(200).json("Request created");
+}));
+app.post('/preview', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield initializeEE();
+    let requestPayload = {
+        id: 1,
+        email: "preview",
+        coordinates: req.body.coordinates,
+        satellite: "LANDSAT/LC09/C02/T1_L2",
+        cloudCover: 100,
+        dateFilters: { startDate: '', endDate: '' },
+        metadata: 0,
+        dataValues: 0,
+        spectralSignature: 0
+    };
+    let resultNatural = yield _satLogic.generateURL(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B4', 'SR_B3', 'SR_B2']);
+    requestPayload.email = "preview2";
+    let resultInfrared = yield _satLogic.generateURL(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B5', 'SR_B4', 'SR_B3']);
+    requestPayload.email = "preview3";
+    let resultVegetation = yield _satLogic.generateURL(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B6', 'SR_B5', 'SR_B4']);
+    //let pathRow = await _satLogic.getPathRow(resultNatural);
+    res.status(200).json([resultNatural, resultInfrared, resultVegetation]);
 }));
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Express is listening at http://localhost:${port}`);
@@ -70,7 +91,7 @@ const initializeEE = () => __awaiter(void 0, void 0, void 0, function* () {
 function checkForImages() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield axios_1.default.get('http://localhost:${port}/checkSatellites');
+            const response = yield axios_1.default.get('http://localhost:/' + port + '/checkSatellites');
             console.log('Satellites checked successfully:', response.data);
         }
         catch (error) {

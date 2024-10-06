@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:5.7
-    container_name: my_mysql_db
+    image: mysql:8.0
+    container_name: my_mysql_db2
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: mydatabase
@@ -28,7 +28,13 @@ services:
     image: front_end
     container_name: my_front_end
     ports:
-      - "8000:8000"
+      - "80:8000"
+
+  back_end:
+    image: back_end
+    container_name: my_back_end
+    ports:
+      - "3000:3000"
 
 volumes:
   mysql-data:
