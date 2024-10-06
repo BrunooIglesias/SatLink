@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Box, Paper, Stepper, Step, StepLabel, ThemeProvider, createTheme } from "@mui/material";
+import { Button, Box, Paper, Stepper, Step, StepLabel, ThemeProvider, createTheme, CircularProgress } from "@mui/material";
 import UserDetailsForm from "@/components/user-details-panel/components/UserDetailsForm";
 import SatellitePropertiesForm from "@/components/user-details-panel/components/SatellitePropertiesForm";
 
@@ -12,6 +12,7 @@ interface UserDetailsPanelProps {
     latLng: { lat: number; lng: number } | null;
     satelliteData: any;
     onSatelliteChange: (key: string, value: any) => void;
+    isLoading: boolean;
 }
 
 const pureBlackTheme = createTheme({
@@ -69,15 +70,16 @@ const pureBlackTheme = createTheme({
 });
 
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
-    isOpen,
-    onClose,
-    formData,
-    onInputChange,
-    onSubmit,
-    latLng,
-    satelliteData,
-    onSatelliteChange
-}) => {
+                                                               isOpen,
+                                                               onClose,
+                                                               formData,
+                                                               onInputChange,
+                                                               onSubmit,
+                                                               latLng,
+                                                               satelliteData,
+                                                               onSatelliteChange,
+                                                               isLoading
+                                                           }) => {
     const [activeStep, setActiveStep] = useState(0);
 
     const handleNext = () => {
@@ -179,16 +181,17 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
                             variant="contained"
                             onClick={onSubmit}
                             sx={{ width: "48%" }}
+                            disabled={isLoading}
                         >
-                            Submit
+                            {isLoading ? <CircularProgress size={24} /> : "Submit"}
                         </Button>
                     )}
                 </Box>
 
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                    <Button 
-                        variant="contained" 
-                        onClick={onClose} 
+                    <Button
+                        variant="contained"
+                        onClick={onClose}
                         fullWidth
                         sx={{
                             color: '#000000',

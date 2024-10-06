@@ -9,17 +9,23 @@ const ImagePage: React.FC = () => {
   const { id } = router.query;
   const [imageData, setImageData] = useState(null);
 
-  useEffect(() => {
-    if (id) {
-      fetchResults(id as string)
-          .then(response => {
-            setImageData(response);
-          })
-          .catch(error => {
-            console.error("Error fetching image data:", error);
-          });
-    }
-  }, [id]);
+    useEffect(() => {
+        const fetchData = async () => {
+            if (id) {
+                try {
+                    const result = await fetchResults(id as string);
+                    console.log("result", result);
+                    if (result) {
+                        setImageData(result);
+                    }
+                } catch (error) {
+                    console.error("Error fetching image data:", error);
+                }
+            }
+        };
+
+        fetchData();
+    }, [id]);
 
   if (!imageData) {
     return (
