@@ -49,8 +49,9 @@ export class SatLogic {
     if (usersData.length == 0) {
       console.log("No users found for satellite: ", satellite);
     }
+    let bandsToUse = ['SR_B4', 'SR_B3', 'SR_B2'];
     for (let i = 0; i < usersData.length; i++) {
-      this.generateData(usersData[i], satellite);
+      this.generateData(usersData[i], satellite, bandsToUse);
     }
   }
     
@@ -61,7 +62,7 @@ export class SatLogic {
       return InterestedUsers;
     }
 
-    generateData = async (userData, satellite) => {
+    generateData = async (userData, satellite, bandsToUse) => {
       const ee = require('@google/earthengine');
       const fs = require('fs');
       const https = require('https');
@@ -73,12 +74,12 @@ export class SatLogic {
 
       let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.5, userData.coordinates.lon - 0.5], [userData.coordinates.lat - 0.5, userData.coordinates.lon + 0.5], [userData.coordinates.lat + 0.5, userData.coordinates.lon + 0.5], [userData.coordinates.lat + 0.5, userData.coordinates.lon - 0.5]]]);
   
-      await new Promise<void>((resolve, reject) => {
+      await new Promise<{} | void>((resolve, reject) => {
           ee.data.authenticateViaPrivateKey(privateKey, function() {
               ee.initialize(null, null, function() {
                   console.log('Earth Engine client initialized.');
                   let endDate = ee.Date(Date.now());
-                  let startDate = endDate.advance(-30, 'day');
+                  let startDate = endDate.advance(-60, 'day');
                   if (userData.dateFilters.startDate != '') {
                       endDate = ee.Date(userData.dateFilters.endDate);
                       startDate = ee.Date(userData.dateFilters.startDate);
@@ -94,9 +95,9 @@ export class SatLogic {
                   if (collection) {
                       const downloadURL = collection.getDownloadURL({
                           name: satellite + "_image",
-                          bands: ['SR_B4', 'SR_B3', 'SR_B2'], // Bandas RGB
+                          bands: bandsToUse, // Bandas RGB
                           region: collection.geometry(),
-                          scale: 400,
+                          scale: 100,
                           format: 'GEO_TIFF'
                       });
   
@@ -115,13 +116,13 @@ export class SatLogic {
   
                               try {
                                   await sharp(filePath)
-                                      .jpeg({ quality: 90 }) // Set JPEG quality if needed
+                                      .jpeg() // Set JPEG quality if needed
                                       .toFile(jpegFilePath);
   
                                   console.log("Image converted to JPEG: " + jpegFilePath);
   
                                   // Read the JPEG image into a buffer
-                                  const imageBuffer = fs.readFileSync(jpegFilePath);
+                                  const imageBuffer = await fs.readFileSync(jpegFilePath);
                                   
                                     //SPECTRAL SIGNATURE
                                   if (userData.spectralSignature) {
@@ -162,8 +163,23 @@ export class SatLogic {
                                     });
                                   }
                                   // Insert the result into the database
-                                  insertResult(userData.email, userData.name, imageBuffer, fileName, pixelValue, spectralValues);
-                                  console.log("Result inserted correctly for: ", userData.email);
+                                  if (userData.email != "preview" && userData.email != "preview2" && userData.email != "preview3") {
+                                    insertResult(userData.email, userData.name, imageBuffer, fileName, pixelValue, spectralValues);
+                                    console.log("Result inserted correctly for: ", userData.email);
+                                  }
+
+
+
+                                  // Get the Path and Row from the filtered result
+                                  var path = "";
+                                  var row = "";
+                                  await collection.toDictionary().getInfo(await function(metadata) {
+                                    console.log("Metadata:", metadata);
+                                      path = metadata.WRS_PATH;
+                                      row = metadata.WRS_ROW;
+                                  });
+
+                                  return imageBuffer;
                                   resolve();
                               } catch (error) {
                                   console.error("Error converting image:", error);
@@ -171,8 +187,8 @@ export class SatLogic {
                               }
                           });
                       });
-                  }}catch{
-                    console.error("No mosaic found for satellite:", satellite);
+                  }}catch(error){
+                    console.error("No mosaic found for satellite:", satellite, error);
                   }
               });
           });

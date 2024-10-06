@@ -1,8 +1,8 @@
 export class requestDto {
   latitude: string;
   longitude: string;
-  name: string;
-  email: string;
+  name: string | null;
+  email: string | null;
   satellite: string;
   cloudThreshold: number;
   mostRecent : boolean;

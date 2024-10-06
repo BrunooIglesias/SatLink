@@ -40,6 +40,30 @@ app.post('/userRequest', async (req, res) => {
   res.status(200).json("Request created");
 });
 
+app.post('/preview', async (req, res) => {
+  await initializeEE();
+  let requestPayload = {    //Preview fixed request
+    id: 1,
+    email: "preview",
+    coordinates: req.body.coordinates,
+    satellite: "LANDSAT/LC09/C02/T1_L2",
+    cloudCover: 100,
+    dateFilters: {startDate: '', endDate: ''},
+    metadata: 0,
+    dataValues: 0,
+    spectralSignature: 0
+
+  }
+  let result = [];
+  let resultNatural  = await _satLogic.generateData(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B4', 'SR_B3', 'SR_B2']);
+  requestPayload.email = "preview2";
+  let resultInfrared = await _satLogic.generateData(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B5', 'SR_B4', 'SR_B3']);
+  requestPayload.email = "preview3";
+  let resultVegetation = await _satLogic.generateData(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B6', 'SR_B5', 'SR_B4']);
+  res.status(200).json([resultNatural, resultInfrared, resultVegetation]);
+});
+
+
 app.listen(port, async () => {
   console.log(`Express is listening at http://localhost:${port}`);
 });
