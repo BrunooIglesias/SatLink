@@ -1,0 +1,33 @@
+# Use an official Python image based on Alpine
+FROM python:3.12.7-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Install cron and bash
+RUN apk add --no-cache bash busybox-suid shadow \
+    && apk add --no-cache --virtual .build-deps gcc musl-dev \
+    && apk add --no-cache mariadb-connector-c-dev \
+    && apk add --no-cache --update --no-cache python3-dev libffi-dev openssl-dev gcc libc-dev make
+
+# Copy the requirements.txt and the script
+COPY requirements.txt requirements.txt
+COPY script.py script.py
+
+# Install the required packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the crontab file
+COPY crontab /etc/cron.d/email-cron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/email-cron
+
+# Apply the cron job
+RUN crontab /etc/cron.d/email-cron
+
+# Create the log file for cron
+RUN touch /var/log/cron.log
+
+# Start the cron service in the foreground
+CMD ["crond", "-f"]
