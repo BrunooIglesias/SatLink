@@ -199,7 +199,7 @@ export class SatLogic {
         [userData.coordinates.lon + 0.5, userData.coordinates.lat - 0.5]
     ]]);
 
-    return new Promise((resolve, reject) => {
+    return new Promise<{buffer,data}>((resolve, reject) => {
         ee.data.authenticateViaPrivateKey(privateKey, function() {
             ee.initialize(null, null, async function() {
                 console.log('Earth Engine client initialized.');
@@ -233,7 +233,36 @@ export class SatLogic {
                         });
 
                         console.log('Download URL generated:', downloadURL);
-                        resolve(downloadURL);
+                        let filePath = userData.email + ".tif";
+                      const file = fs.createWriteStream(filePath);
+                      https.get(downloadURL, function(response) {
+                          response.pipe(file);
+                          file.on('finish', async function() {
+                              file.close();
+                              console.log("Image downloaded to " + userData.email + ".tif");
+  
+                              // Convert the TIFF to JPEG using sharp
+                              const jpegFilePath = userData.email + ".jpg";
+  
+                              try {
+                                  await sharp(filePath)
+                                      .jpeg() // Set JPEG quality if needed
+                                      .toFile(jpegFilePath);
+  
+                                  console.log("Image converted to JPEG: " + jpegFilePath);
+  
+                                  // Read the JPEG image into a buffer
+                                  const imageBuffer = await fs.readFileSync(jpegFilePath);
+                                  
+                                 
+    
+                                  resolve(imageBuffer);
+                              } catch (error) {
+                                  console.error("Error converting image:", error);
+                                  reject(error);
+                              }
+                          });
+                        });
                     } else {
                         reject(new Error(`No images found for satellite: ${satellite}`));
                     }
