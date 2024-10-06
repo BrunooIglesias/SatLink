@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
+import SatLink from '../../public/images/satlink.png';
 
 const Navbar: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -30,9 +32,13 @@ const Navbar: React.FC = () => {
                 zIndex: 1000,
                 boxShadow: '0px 4px 2px -2px gray',
             }}>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-                    SatLink
-                </div>
+                <Image 
+                    src={SatLink} 
+                    alt="SatLink Logo" 
+                    width={120} 
+                    height={64} 
+                    style={{ objectFit: 'contain' }}
+                />
             </nav>
         );
     }
@@ -54,11 +60,24 @@ const Navbar: React.FC = () => {
             zIndex: 1000,
             boxShadow: '0px 4px 2px -2px gray',
         }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
-                Get your Landsat Image
+            {/* Left Section - Text */}
+            <div style={{ fontSize: '0.8rem', fontWeight: 'bold', flex: 1 }}>
+                Press somewhere on the map to get your image!
             </div>
 
-            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', alignItems: 'center' }}>
+            {/* Center Section - Logo */}
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                <Image 
+                    src={SatLink} 
+                    alt="SatLink Logo" 
+                    width={120} 
+                    height={64} 
+                    style={{ objectFit: 'contain' }}
+                />
+            </div>
+
+            {/* Right Section - Search */}
+            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'flex-end' }}>
                 <input
                     type="text"
                     placeholder="Where...?"
