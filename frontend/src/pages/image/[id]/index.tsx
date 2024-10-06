@@ -5,16 +5,15 @@ import { fetchResults } from "@/api-flows/fetchResults";
 import { CircularProgress, Box } from '@mui/material';
 
 const ImagePage: React.FC = () => {
-  const router = useRouter();
-  const { id } = router.query;
-  const [imageData, setImageData] = useState(null);
+    const router = useRouter();
+    const { id } = router.query;
+    const [imageData, setImageData] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             if (id) {
                 try {
                     const result = await fetchResults(id as string);
-                    console.log("result", result);
                     if (result) {
                         setImageData(result);
                     }
@@ -27,23 +26,23 @@ const ImagePage: React.FC = () => {
         fetchData();
     }, [id]);
 
-  if (!imageData) {
-    return (
-        <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '100vh',
-              color: 'white',
-            }}
-        >
-          <CircularProgress />
-        </Box>
-    );
-  }
+    if (!imageData) {
+        return (
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: '100vh',
+                    color: 'white',
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
 
-  return <ImageContainer imageData={imageData} />;
+    return <ImageContainer imageData={imageData} />;
 };
 
 export default ImagePage;
