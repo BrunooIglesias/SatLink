@@ -89,8 +89,6 @@ export class SatLogic {
                                        .filterBounds(point)
                                        .sort('system:time_start', false)
                                        .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
-
-
                   try{
                   if (collection) {
                       const downloadURL = collection.getDownloadURL({
@@ -169,7 +167,7 @@ export class SatLogic {
                                   }
 
 
-                                  return imageBuffer;
+                                  return downloadURL;
                                   resolve();
                               } catch (error) {
                                   console.error("Error converting image:", error);
@@ -185,8 +183,58 @@ export class SatLogic {
       });
   }
 
+  generateURL = async (userData, satellite, bandsToUse) => {
+    const ee = require('@google/earthengine');
+    const fs = require('fs');
+    const https = require('https');
+    const sharp = require('sharp');  // Import sharp for image processing
+    const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
+
+    console.log("Generating data for user: ", userData.email);
+    let point = ee.Geometry.Point([userData.coordinates.lon, userData.coordinates.lat]);
+
+    let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.5, userData.coordinates.lon - 0.5], [userData.coordinates.lat - 0.5, userData.coordinates.lon + 0.5], [userData.coordinates.lat + 0.5, userData.coordinates.lon + 0.5], [userData.coordinates.lat + 0.5, userData.coordinates.lon - 0.5]]]);
+
+    await new Promise<{} | void>((resolve, reject) => {
+        ee.data.authenticateViaPrivateKey(privateKey, function() {
+            ee.initialize(null, null, function() {
+                console.log('Earth Engine client initialized.');
+                let endDate = ee.Date(Date.now());
+                let startDate = endDate.advance(-60, 'day');
+                if (userData.dateFilters.startDate != '') {
+                    endDate = ee.Date(userData.dateFilters.endDate);
+                    startDate = ee.Date(userData.dateFilters.startDate);
+                }
+                const collection = ee.ImageCollection(satellite)
+                                     .filterDate(startDate, endDate)
+                                     .filterBounds(point)
+                                     .sort('system:time_start', false)
+                                     .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
+                try{
+                if (collection) {
+                    const downloadURL = collection.getDownloadURL({
+                        name: satellite + "_image",
+                        bands: bandsToUse, // Bandas RGB
+                        region: collection.geometry(),
+                        scale: 100,
+                        format: 'GEO_TIFF'
+                    });
+
+                    console.log('Download URL for the mosaic of Landsat 8 image in Uruguay:', downloadURL);
+                    return(downloadURL);
+                    resolve();
+                  }
+                }catch(err){
+                  console.error("No mosaic found for satellite:", satellite, err);
+                }
+                   
+                            
+            });
+        });
+    });
+}
+
   getPathRow = async (collection)=>{
-    // Get the Path and Row from the filtered result
     var path = "";
     var row = "";
     await collection.toDictionary().getInfo(await function(metadata) {
