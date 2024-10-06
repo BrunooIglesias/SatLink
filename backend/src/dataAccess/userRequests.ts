@@ -35,7 +35,7 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
       console.log('Error inserting data:', error, 'Data received: ', email, name, coordinates, satellite, cloudCover, dateFilters, metadata, dataValues, spectralSignature);
     }
 }
-export async function insertResult(email,name,image, metadata, dataValues, spectralSignature) {
+export async function insertResult(email,name,image, metadata, dataValues, spectralSignature, imageFile) {
     const connection = await mysql.createConnection({
       host: 'localhost',
       port: 3306,
@@ -44,8 +44,8 @@ export async function insertResult(email,name,image, metadata, dataValues, spect
       database: 'mydatabase', // Replace with your MySQL database name
   });
     const resultsRequestQuery = `
-        INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature) 
-        VALUES (?, ?, ?, ?, ?, ?)`;
+        INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature, ImageFile) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`;
     try{
       const params = [
         email || null,
@@ -53,7 +53,8 @@ export async function insertResult(email,name,image, metadata, dataValues, spect
         image || null,
         metadata || null,
         dataValues || null,
-        spectralSignature || null
+        spectralSignature || null,
+        imageFile || null
       ];
 
       await connection.execute(resultsRequestQuery, params);
@@ -121,7 +122,7 @@ export async function getResult(userParamId) {
 
   try {
 
-    const rows : any[] = await connection.execute('SELECT dataValues,SpectralSignature FROM ResultsRequests WHERE id = ?', [userParamId]);
+    const rows : any[] = await connection.execute('SELECT dataValues,SpectralSignature,image FROM ResultsRequests WHERE id = ?', [userParamId]);
     
     if (rows.length === 0) {
       console.log(`No results found for ID: ${userParamId}`);

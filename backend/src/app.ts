@@ -31,7 +31,7 @@ app.get('/checkSatellites', async (req, res) => {
 
 app.get('/results/:id', async (req, res) => {
   let result = await _userLogic.getResults(req.params.id);
-  res.status(200).json(result);
+  res.status(200).json(result[0][0]);
 });
 
 app.post('/userRequest', async (req, res) => {
@@ -56,7 +56,6 @@ app.post('/preview', async (req, res) => {
   }
 
   let resultNatural  = await _satLogic.generateURL(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B4', 'SR_B3', 'SR_B2']);
-  console.log(resultNatural);
   requestPayload.email = "preview2";
   let resultInfrared = await _satLogic.generateURL(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B5', 'SR_B4', 'SR_B3']);
   requestPayload.email = "preview3";
