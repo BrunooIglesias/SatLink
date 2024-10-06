@@ -1,6 +1,5 @@
 @echo off
 
-
 REM Delete the existing Docker image if it exists
 docker rmi email_sender --force
 docker rmi front_end --force
