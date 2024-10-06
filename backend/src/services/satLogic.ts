@@ -69,51 +69,49 @@ export class SatLogic {
       const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
   
       console.log("Generating data for user: ", userData.email);
-      let coord : Number[] = [userData.coordinates.lat, userData.coordinates.lon];
+      let point = ee.Geometry.Point([userData.coordinates.lon, userData.coordinates.lat]);
 
-      let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.1, userData.coordinates.lon - 0.1], [userData.coordinates.lat - 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon - 0.1]]]);
+      let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.5, userData.coordinates.lon - 0.5], [userData.coordinates.lat - 0.5, userData.coordinates.lon + 0.5], [userData.coordinates.lat + 0.5, userData.coordinates.lon + 0.5], [userData.coordinates.lat + 0.5, userData.coordinates.lon - 0.5]]]);
   
       await new Promise<void>((resolve, reject) => {
           ee.data.authenticateViaPrivateKey(privateKey, function() {
               ee.initialize(null, null, function() {
                   console.log('Earth Engine client initialized.');
                   let endDate = ee.Date(Date.now());
-                  let startDate = endDate.advance(-20, 'day');
-                  if (userData.dateFilters) {
+                  let startDate = endDate.advance(-30, 'day');
+                  if (userData.dateFilters.startDate != '') {
                       endDate = ee.Date(userData.dateFilters.endDate);
                       startDate = ee.Date(userData.dateFilters.startDate);
                   }
-                  //GET PICTURE
-                  
                   const collection = ee.ImageCollection(satellite)
-                      .filterDate(startDate, endDate)
-                      .filterBounds(box)
-                      .sort('system:time_start', false)
-                      .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();;
-                  console.log('Collection:', collection);
-                  const mosaic = collection.mosaic(); // Usar mosaic para combinar imágenes
-                  console.log('Mosaic:', mosaic);
-                  if (mosaic) {
-                      const downloadURL = mosaic.getDownloadURL({
-                          name: satellite + "_mosaic",
+                                       .filterDate(startDate, endDate)
+                                       .filterBounds(point)
+                                       .sort('system:time_start', false)
+                                       .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
+
+
+                  try{
+                  if (collection) {
+                      const downloadURL = collection.getDownloadURL({
+                          name: satellite + "_image",
                           bands: ['SR_B4', 'SR_B3', 'SR_B2'], // Bandas RGB
-                          region: box,
+                          region: collection.geometry(),
                           scale: 400,
                           format: 'GEO_TIFF'
                       });
   
                       console.log('Download URL for the mosaic of Landsat 8 image in Uruguay:', downloadURL);
   
-                      let filePath = userData.userMail + ".tif";
+                      let filePath = userData.email + ".tif";
                       const file = fs.createWriteStream(filePath);
                       https.get(downloadURL, function(response) {
                           response.pipe(file);
                           file.on('finish', async function() {
                               file.close();
-                              console.log("Image downloaded to " + userData.userMail + ".tif");
+                              console.log("Image downloaded to " + userData.email + ".tif");
   
                               // Convert the TIFF to JPEG using sharp
-                              const jpegFilePath = userData.userMail + ".jpg";
+                              const jpegFilePath = userData.email + ".jpg";
   
                               try {
                                   await sharp(filePath)
@@ -127,37 +125,45 @@ export class SatLogic {
                                   
                                     //SPECTRAL SIGNATURE
                                   if (userData.spectralSignature) {
-                                    var geometry = collection.first().geometry();
+                                    var geometry = collection.geometry();
                                     var centroid = geometry.centroid(); 
-                                    var spectralValues = collection.first().reduceRegion({
+                                    var spectralValues = await collection.reduceRegion({
                                       reducer: ee.Reducer.first(),
                                       geometry: centroid,
                                       scale: 1000
                                     }).getInfo();
                                 
-                                    console.log("Spectral values ", spectralValues); 
                                   }
                                   //DATA VALUES
-                                  if (userData.dataValues) {
+                                  if (userData.dataValues == 1) {
                                     var temperatureBand = collection.select(['ST_B10']);
                                     var pixelValue = temperatureBand.reduceRegion({
                                       reducer: ee.Reducer.mean(),
-                                      geometry: coord,
+                                      geometry: point,
                                       scale: 30
-                                    });
+                                  });
+                                  
+                                  // Use getInfo() directly and handle the response without chaining .then()
+                                  await pixelValue.getInfo(function(result) {
+                                    pixelValue = result;
+                                  }, function(err) {
+                                      console.error("Error getting pixel value:", err);
+                                  });
                                   }
                                     //METADATA IN CSV FORMAT
-                                  if (userData.metadata) {
+                                  let fileName = '';
+                                  if (userData.metadata == 1) {
+                                    console.log("Getting csv metadata...");
                                     collection.toDictionary().getInfo(function(metadata) {
                                       var csvContent = convertMetadataToCSV(metadata);
-                                      fs.writeFileSync('landsat_image_metadata.csv', csvContent);
+                                      fileName = 'landsat_image_metadata_' + userData.name + '.csv';
+                                      fs.writeFileSync(fileName, csvContent);
                                       console.log('Metadata CSV saved as landsat_image_metadata.csv');
                                     });
                                   }
                                   // Insert the result into the database
-                                  insertResult(userData.userMail, userData.sat, imageBuffer, userData.metadata, pixelValue, spectralValues);
-                                
-                                  console.log("Result inserted correctly for: ", userData.userMail);
+                                  insertResult(userData.email, userData.name, imageBuffer, fileName, pixelValue, spectralValues);
+                                  console.log("Result inserted correctly for: ", userData.email);
                                   resolve();
                               } catch (error) {
                                   console.error("Error converting image:", error);
@@ -165,8 +171,8 @@ export class SatLogic {
                               }
                           });
                       });
-                  } else {
-                      console.error("No mosaic found for satellite:", satellite);
+                  }}catch{
+                    console.error("No mosaic found for satellite:", satellite);
                   }
               });
           });

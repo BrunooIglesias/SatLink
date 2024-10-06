@@ -30,8 +30,8 @@ app.get('/checkSatellites', async (req, res) => {
 });
 
 app.get('/results/:id', async (req, res) => {
-  await _userLogic.getResults(req.params.id);
-  res.status(200).json("Satellites checked");
+  let result = await _userLogic.getResults(req.params.id);
+  res.status(200).json(result);
 });
 
 app.post('/userRequest', async (req, res) => {
@@ -70,7 +70,7 @@ const initializeEE = async () => {
 };
 async function checkForImages() {
   try {
-    const response = await axios.get('http://localhost:${port}/checkSatellites');
+    const response = await axios.get('http://localhost:/'+port+'/checkSatellites');
     console.log('Satellites checked successfully:', response.data);
   } catch (error) {
     console.error('Error checking satellites:', error);

@@ -42,7 +42,6 @@ export class UserLogic {
   getResults = async (idResult: string) => {
     try {
       const results = await getResult(idResult);
-      console.log(results);
       return results;
     } catch (error) {
       console.error('Error fetching results:', error);
