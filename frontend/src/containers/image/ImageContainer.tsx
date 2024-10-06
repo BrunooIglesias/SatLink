@@ -15,7 +15,7 @@ const ImageContainer: React.FC<ImageContainerProps> = ({ imageData }) => {
     const { image, dataValues, SpectralSignature } = imageData;
 
     const transformedDataValues = Object.entries(dataValues).reduce((acc, [key, value]) => {
-        acc[key] = value * 0.00341802;
+        acc[key] = value;
         return acc;
     }, {} as { [key: string]: number });
 
