@@ -48,7 +48,7 @@ function insertRequest(email, name, coordinates, satellite, cloudCover, dateFilt
         }
     });
 }
-function insertResult(email, name, image, metadata, dataValues, spectralSignature) {
+function insertResult(email, name, image, metadata, dataValues, spectralSignature, imageFile) {
     return __awaiter(this, void 0, void 0, function* () {
         const connection = yield promise_1.default.createConnection({
             host: 'localhost',
@@ -58,14 +58,19 @@ function insertResult(email, name, image, metadata, dataValues, spectralSignatur
             database: 'mydatabase', // Replace with your MySQL database name
         });
         const resultsRequestQuery = `
-        INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature) 
-        VALUES (?, ?, ?, ?, ?, ?)`;
+        INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature, ImageFile) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`;
         try {
-            yield connection.execute(resultsRequestQuery, [
-                email,
-                name,
-                image
-            ]);
+            const params = [
+                email || null,
+                "name",
+                image || null,
+                metadata || null,
+                dataValues || null,
+                spectralSignature || null,
+                imageFile || null
+            ];
+            yield connection.execute(resultsRequestQuery, params);
             console.log('Inserted into ResultsRequests successfully.');
         }
         catch (error) {
@@ -83,7 +88,7 @@ function getUsersInRegion(regionCoordinates, paramSatellite) {
             database: 'mydatabase',
         });
         try {
-            const [rows] = yield connection.execute('SELECT id, email, coordinates FROM PendingRequests WHERE satellite = ?', [paramSatellite]);
+            const [rows] = yield connection.execute('SELECT * FROM PendingRequests WHERE satellite = ?', [paramSatellite]);
             const usersInRegion = [];
             rows.forEach((row) => {
                 const userCoordinates = row.coordinates; // Assuming coordinates are stored as JSON in DB
@@ -118,25 +123,24 @@ function getResult(userParamId) {
         const connection = yield promise_1.default.createConnection({
             host: 'localhost',
             port: 3306,
-            user: 'your_user', // Replace with your MySQL username
-            password: 'your_password', // Replace with your MySQL password
-            database: 'your_database', // Replace with your MySQL database name
+            user: 'myuser',
+            password: 'mypassword',
+            database: 'mydatabase',
         });
         try {
-            // Query to select results where ID matches userParamId
-            const rows = yield connection.execute('SELECT * FROM ResultsRequests WHERE id = ?', [userParamId]);
+            const rows = yield connection.execute('SELECT dataValues,SpectralSignature,image FROM ResultsRequests WHERE id = ?', [userParamId]);
             if (rows.length === 0) {
                 console.log(`No results found for ID: ${userParamId}`);
                 return [];
             }
-            return rows; // Return the results
+            return rows;
         }
         catch (error) {
             console.error('Error fetching results:', error);
-            throw error; // Rethrow the error for further handling if necessary
+            throw error;
         }
         finally {
-            yield connection.end(); // Close the database connection
+            yield connection.end();
         }
     });
 }
