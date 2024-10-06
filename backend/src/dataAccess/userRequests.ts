@@ -77,7 +77,7 @@ export async function getUsersInRegion(regionCoordinates, paramSatellite) {
     const usersInRegion: Array<{ id: number, email: string, coordinates: any, satellite : string, cloudCover : number, dateFilters : JSON, metadata:JSON, dataValues:JSON, spectralSignature:JSON}> = [];
 
     rows.forEach((row: { id: number, email: string, coordinates: any, satellite : string, cloudCover : number, dateFilters : JSON, metadata:JSON, dataValues:JSON, spectralSignature:JSON}) => {
-      const userCoordinates = JSON.parse(row.coordinates); // Assuming coordinates are stored as JSON in DB
+      const userCoordinates = row.coordinates; // Assuming coordinates are stored as JSON in DB
 
       // Check if the user's coordinates are inside the region
       if (isPointInSquare(userCoordinates, regionCoordinates)) {

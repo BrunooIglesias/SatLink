@@ -62,7 +62,9 @@ class SatLogic {
             const https = require('https');
             const sharp = require('sharp'); // Import sharp for image processing
             const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
-            console.log("Generating data for user: ", userData.userMail);
+            console.log("Generating data for user: ", userData.email);
+            let coord = [userData.coordinates.lat, userData.coordinates.lon];
+            let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.1, userData.coordinates.lon - 0.1], [userData.coordinates.lat - 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon - 0.1]]]);
             yield new Promise((resolve, reject) => {
                 ee.data.authenticateViaPrivateKey(privateKey, function () {
                     ee.initialize(null, null, function () {
@@ -76,16 +78,18 @@ class SatLogic {
                         //GET PICTURE
                         const collection = ee.ImageCollection(satellite)
                             .filterDate(startDate, endDate)
-                            .filterBounds(userData.coordinates)
+                            .filterBounds(box)
                             .sort('system:time_start', false)
-                            .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover));
+                            .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
                         ;
+                        console.log('Collection:', collection);
                         const mosaic = collection.mosaic(); // Usar mosaic para combinar imágenes
+                        console.log('Mosaic:', mosaic);
                         if (mosaic) {
                             const downloadURL = mosaic.getDownloadURL({
                                 name: satellite + "_mosaic",
                                 bands: ['SR_B4', 'SR_B3', 'SR_B2'], // Bandas RGB
-                                region: userData.coordinates,
+                                region: box,
                                 scale: 400,
                                 format: 'GEO_TIFF'
                             });
@@ -118,6 +122,15 @@ class SatLogic {
                                                 }).getInfo();
                                                 console.log("Spectral values ", spectralValues);
                                             }
+                                            //DATA VALUES
+                                            if (userData.dataValues) {
+                                                var temperatureBand = collection.select(['ST_B10']);
+                                                var pixelValue = temperatureBand.reduceRegion({
+                                                    reducer: ee.Reducer.mean(),
+                                                    geometry: coord,
+                                                    scale: 30
+                                                });
+                                            }
                                             //METADATA IN CSV FORMAT
                                             if (userData.metadata) {
                                                 collection.toDictionary().getInfo(function (metadata) {
@@ -127,7 +140,7 @@ class SatLogic {
                                                 });
                                             }
                                             // Insert the result into the database
-                                            (0, userRequests_1.insertResult)(userData.userMail, userData.sat, imageBuffer, userData.metadata, userData.dataValues, userData.spectralSignature);
+                                            (0, userRequests_1.insertResult)(userData.userMail, userData.sat, imageBuffer, userData.metadata, pixelValue, spectralValues);
                                             console.log("Result inserted correctly for: ", userData.userMail);
                                             resolve();
                                         }

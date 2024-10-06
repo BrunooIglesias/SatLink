@@ -11,27 +11,19 @@ export class UserLogic {
         throw new Error("Latitude and longitude must be numbers.");
       }
 
-      const coordinates = [landsatCollection.latitude, landsatCollection.longitude];
-
-      // Create bounding box of 4 coordinates around the given point
-      const coordinatesBox = [
-        [coordinates[0] + 0.1, coordinates[1] + 0.1],
-        [coordinates[0] - 0.1, coordinates[1] + 0.1],
-        [coordinates[0] + 0.1, coordinates[1] - 0.1],
-        [coordinates[0] - 0.1, coordinates[1] - 0.1]
-      ];
-
-      const formattedCoordinatesBox = coordinatesBox.map(([lat, lon]) => ({
-        lat: lat,
-        lon: lon
-      }));
+      // Create a single coordinate object
+      const formattedCoordinates = {
+        lat: landsatCollection.latitude,
+        lon: landsatCollection.longitude
+      };
 
       const dateFilters = { startDate: landsatCollection.fromDate, endDate: landsatCollection.toDate };
 
+      // Send the request with the single coordinate object
       await insertRequest(
         landsatCollection.email,
         landsatCollection.name,
-        formattedCoordinatesBox,  // Updated this to use the surrounding coordinates
+        formattedCoordinates,  // Send a single coordinate, not an array
         landsatCollection.satellite,
         landsatCollection.cloudThreshold,
         dateFilters,

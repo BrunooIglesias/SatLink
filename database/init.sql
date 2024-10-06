@@ -28,16 +28,15 @@ CREATE TABLE `PendingRequests` (
   `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `coordinates` json NOT NULL,
   `cloudCover` int DEFAULT NULL,
   `dateFilters` json DEFAULT NULL,
   `metadata` varchar(1) DEFAULT NULL,
   `dataValues` varchar(1) DEFAULT NULL,
   `spectralSignature` varchar(1) DEFAULT NULL,
   `satellite` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `PendingRequests_chk_1` CHECK (((json_length(`coordinates`) = 4) and (json_extract(`coordinates`,_utf8mb4'$[0]') is not null) and (json_extract(`coordinates`,_utf8mb4'$[1]') is not null) and (json_extract(`coordinates`,_utf8mb4'$[2]') is not null) and (json_extract(`coordinates`,_utf8mb4'$[3]') is not null)))
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `coordinates` json NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,6 +45,7 @@ CREATE TABLE `PendingRequests` (
 
 LOCK TABLES `PendingRequests` WRITE;
 /*!40000 ALTER TABLE `PendingRequests` DISABLE KEYS */;
+INSERT INTO `PendingRequests` VALUES (7,'santiagosalinasoto@gmail.com','Sanfaisd',0,'{\"endDate\": \"\", \"startDate\": \"\"}','1','1','1','LANDSAT/LC09/C02/T1_L2','{\"lat\": -34.37971258046219, \"lon\": -55.37109375000001}');
 /*!40000 ALTER TABLE `PendingRequests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,4 +88,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-05 20:14:26
+-- Dump completed on 2024-10-05 21:00:22

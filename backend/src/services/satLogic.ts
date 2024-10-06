@@ -68,8 +68,10 @@ export class SatLogic {
       const sharp = require('sharp');  // Import sharp for image processing
       const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
   
-      console.log("Generating data for user: ", userData.userMail);
+      console.log("Generating data for user: ", userData.email);
       let coord : Number[] = [userData.coordinates.lat, userData.coordinates.lon];
+
+      let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.1, userData.coordinates.lon - 0.1], [userData.coordinates.lat - 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon - 0.1]]]);
   
       await new Promise<void>((resolve, reject) => {
           ee.data.authenticateViaPrivateKey(privateKey, function() {
@@ -82,19 +84,20 @@ export class SatLogic {
                       startDate = ee.Date(userData.dateFilters.startDate);
                   }
                   //GET PICTURE
+                  
                   const collection = ee.ImageCollection(satellite)
                       .filterDate(startDate, endDate)
-                      .filterBounds(coord)
+                      .filterBounds(box)
                       .sort('system:time_start', false)
                       .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();;
-  
+                  console.log('Collection:', collection);
                   const mosaic = collection.mosaic(); // Usar mosaic para combinar imágenes
-  
+                  console.log('Mosaic:', mosaic);
                   if (mosaic) {
                       const downloadURL = mosaic.getDownloadURL({
                           name: satellite + "_mosaic",
                           bands: ['SR_B4', 'SR_B3', 'SR_B2'], // Bandas RGB
-                          region: coord,
+                          region: box,
                           scale: 400,
                           format: 'GEO_TIFF'
                       });
