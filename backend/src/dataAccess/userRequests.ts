@@ -4,7 +4,7 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
     
     try {
         const connection = await mysql.createConnection({
-          host: 'localhost',
+          host: 'mysql',
           port: 3306,
           user: 'myuser',         
           password: 'mypassword',
@@ -37,7 +37,7 @@ export async function insertRequest(email, name, coordinates, satellite, cloudCo
 }
 export async function insertResult(email,name,image, metadata, dataValues, spectralSignature, imageFile) {
     const connection = await mysql.createConnection({
-      host: 'localhost',
+      host: 'mysql',
       port: 3306,
       user: 'myuser',  
       password: 'mypassword',
@@ -69,7 +69,7 @@ export async function insertResult(email,name,image, metadata, dataValues, spect
 
 export async function getUsersInRegion(regionCoordinates, paramSatellite) {
   const connection = await mysql.createConnection({
-    host: 'localhost',
+    host: 'mysql',
             port: 3306,
             user: 'myuser',
             password: 'mypassword',
@@ -112,7 +112,7 @@ export async function getUsersInRegion(regionCoordinates, paramSatellite) {
 }
 export async function getResult(userParamId) {
   const connection = await mysql.createConnection({
-    host: 'localhost',
+    host: 'mysql',
     port: 3306,
     user: 'myuser',
     password: 'mypassword', 

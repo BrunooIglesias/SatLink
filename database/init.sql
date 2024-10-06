@@ -36,7 +36,7 @@ CREATE TABLE `PendingRequests` (
   `satellite` varchar(255) NOT NULL,
   `coordinates` json NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `PendingRequests` (
 
 LOCK TABLES `PendingRequests` WRITE;
 /*!40000 ALTER TABLE `PendingRequests` DISABLE KEYS */;
-INSERT INTO `PendingRequests` VALUES (7,'santiagosalinasoto@gmail.com','Sanfaisd',0,'{\"endDate\": \"\", \"startDate\": \"\"}','1','1','1','LANDSAT/LC09/C02/T1_L2','{\"lat\": -34.37971258046219, \"lon\": -55.37109375000001}');
+INSERT INTO `PendingRequests` VALUES (7,'santiagosalinasoto@gmail.com','Sanfaisd',0,'{\"endDate\": \"\", \"startDate\": \"\"}','1','1','1','LANDSAT/LC09/C02/T1_L2','{\"lat\": -34.37971258046219, \"lon\": -55.37109375000001}'),(8,'santiagosalinasoto@gmail.com','Bruno',3,'{\"endDate\": \"\", \"startDate\": \"\"}','0','0','0','LANDSAT/LC09/C02/T1_L2','{\"lat\": 34.88593094075317, \"lon\": -93.076171875}');
 /*!40000 ALTER TABLE `PendingRequests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -89,4 +89,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-06 16:20:13
+-- Dump completed on 2024-10-06 16:48:03

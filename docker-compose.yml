@@ -18,6 +18,7 @@ services:
   email_sender:
     image: email_sender
     container_name: my_email_sender
+    restart: always
     depends_on:
       - mysql  # Ensure MySQL starts before this service
     environment:
