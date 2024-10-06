@@ -64,19 +64,16 @@ const MapContainer: React.FC = () => {
         try {
             await createUserRequest(data);
 
-            /*
             const coordinates = {
                 lat: latLng?.lat || 0,
                 lon: latLng?.lng || 0
             };
             const previewResponse = await getPreviewImages(coordinates);
 
-            setPreviewImages(previewResponse.data.images);
-
-             */
+            setPreviewImages(previewResponse);
 
             setIsPanelOpen(false);
-            //setIsPreviewPanelOpen(true);
+            setIsPreviewPanelOpen(true);
         } catch (error) {
             console.error('Error submitting user request:', error);
         } finally {
