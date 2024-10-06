@@ -162,10 +162,9 @@ export class SatLogic {
                                   }
                                   // Insert the result into the database
                                   if (userData.email != "preview" && userData.email != "preview2" && userData.email != "preview3") {
-                                    insertResult(userData.email, userData.name, imageBuffer, fileName, pixelValue, spectralValues);
+                                    insertResult(userData.email, userData.name, imageBuffer, fileName, pixelValue, spectralValues, downloadURL);
                                     console.log("Result inserted correctly for: ", userData.email);
                                   }
-
 
                                   return downloadURL;
                                   resolve();
@@ -185,10 +184,10 @@ export class SatLogic {
   generateURL = async (userData, satellite, bandsToUse) => {
     console.log("Generating data for user: ", userData.email);
     const ee = require('@google/earthengine');
-    const fs = require('fs');
-    const https = require('https');
-    const sharp = require('sharp');  // Import sharp for image processing
-    const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
+      const fs = require('fs');
+      const https = require('https');
+      const sharp = require('sharp');  // Import sharp for image processing
+      const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
     // Create a point geometry based on user coordinates
     let point = ee.Geometry.Point([userData.coordinates.lon, userData.coordinates.lat]);
 
@@ -251,7 +250,7 @@ export class SatLogic {
   getPathRow = async (collection)=>{
     var path = "";
     var row = "";
-    await collection.getInfo(await function(metadata) {
+    await collection.toDictionary().getInfo(await function(metadata) {
       console.log("Metadata:", metadata);
         path = metadata.WRS_PATH;
         row = metadata.WRS_ROW;

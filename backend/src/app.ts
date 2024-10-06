@@ -31,7 +31,7 @@ app.get('/checkSatellites', async (req, res) => {
 
 app.get('/results/:id', async (req, res) => {
   let result = await _userLogic.getResults(req.params.id);
-  res.status(200).json(result);
+  res.status(200).json(result[0][0]);
 });
 
 app.post('/userRequest', async (req, res) => {
