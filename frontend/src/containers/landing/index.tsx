@@ -123,6 +123,17 @@ const LandingPage: React.FC = () => {
             textAlign: 'center',
           }}
         >
+          <p
+            style={{
+              fontSize: '1.25rem',
+              color: 'white',
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)',
+              marginBottom: '0.5rem',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            Brought to you by
+          </p>
           <h1
             style={{
               fontSize: '3rem',
@@ -184,7 +195,7 @@ const LandingPage: React.FC = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            Explore My Landsat
+            SATLINK
           </button>
         </div>
       </div>
