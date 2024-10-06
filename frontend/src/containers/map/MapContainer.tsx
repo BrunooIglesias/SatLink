@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import { useState } from "react";
 import { createUserRequest } from "@/api-flows/userRequest";
-import {getPreviewImages} from "@/api-flows/getPreviewImages";
+import { getPreviewImages } from "@/api-flows/getPreviewImages";
 
 const MapComponent = dynamic(() => import("@/components/map/map"), { ssr: false });
 const UserDetailsPanel = dynamic(() => import("@/components/user-details-panel/UserDetailsPanel"), { ssr: false });
@@ -11,6 +11,7 @@ const MapContainer: React.FC = () => {
     const [latLng, setLatLng] = useState<{ lat: number; lng: number } | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isPreviewPanelOpen, setIsPreviewPanelOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '' });
     const [satelliteData, setSatelliteData] = useState({
         satellite: '',
@@ -43,6 +44,8 @@ const MapContainer: React.FC = () => {
     };
 
     const handleSubmit = async () => {
+        setIsLoading(true);
+
         const data = {
             latitude: latLng?.lat,
             longitude: latLng?.lng,
@@ -61,15 +64,23 @@ const MapContainer: React.FC = () => {
         try {
             await createUserRequest(data);
 
-            const coordinates = { lat: latLng?.lat?.toString() || '', lng: latLng?.lng?.toString() || '' };
+            /*
+            const coordinates = {
+                lat: latLng?.lat || 0,
+                lon: latLng?.lng || 0
+            };
             const previewResponse = await getPreviewImages(coordinates);
 
             setPreviewImages(previewResponse.data.images);
 
+             */
+
             setIsPanelOpen(false);
-            setIsPreviewPanelOpen(true);
+            //setIsPreviewPanelOpen(true);
         } catch (error) {
             console.error('Error submitting user request:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -89,6 +100,7 @@ const MapContainer: React.FC = () => {
                 latLng={latLng}
                 satelliteData={satelliteData}
                 onSatelliteChange={handleSatelliteChange}
+                isLoading={isLoading}
             />
             <ImagePreviewPanel
                 isOpen={isPreviewPanelOpen}
