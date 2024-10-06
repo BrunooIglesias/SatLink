@@ -62,9 +62,10 @@ CREATE TABLE `ResultsRequests` (
   `name` varchar(255) NOT NULL,
   `image` longblob NOT NULL,
   `sent` varchar(1) NOT NULL DEFAULT '0',
-  `metadata` json DEFAULT NULL,
+  `metadata` longblob DEFAULT NULL,
   `dataValues` json DEFAULT NULL,
-  `spectralSignature` json DEFAULT NULL,
+  `spectralSignature` json DEFAULT NUL
+  `ImageFile` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
