@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Box, Paper, Stepper, Step, StepLabel } from "@mui/material";
+import { Button, Box, Paper, Stepper, Step, StepLabel, ThemeProvider, createTheme } from "@mui/material";
 import UserDetailsForm from "@/components/user-details-panel/components/UserDetailsForm";
 import SatellitePropertiesForm from "@/components/user-details-panel/components/SatellitePropertiesForm";
 
@@ -14,16 +14,70 @@ interface UserDetailsPanelProps {
     onSatelliteChange: (key: string, value: any) => void;
 }
 
+const pureBlackTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        primary: {
+            main: '#ffffff',
+        },
+        secondary: {
+            main: '#ffffff',
+        },
+        background: {
+            default: '#000000',
+            paper: '#000000',
+        },
+        text: {
+            primary: '#ffffff',
+            secondary: '#cccccc',
+        },
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    color: '#000000',
+                    backgroundColor: '#ffffff',
+                    '&:hover': {
+                        backgroundColor: '#e0e0e0',
+                    },
+                },
+            },
+        },
+        MuiStepIcon: {
+            styleOverrides: {
+                root: {
+                    color: '#333333',
+                    '&.Mui-active': {
+                        color: '#ffffff',
+                    },
+                    '&.Mui-completed': {
+                        color: '#ffffff',
+                    },
+                },
+            },
+        },
+        MuiPaper: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: '#000000',
+                    backgroundImage: 'none',
+                },
+            },
+        },
+    },
+});
+
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
-                                                               isOpen,
-                                                               onClose,
-                                                               formData,
-                                                               onInputChange,
-                                                               onSubmit,
-                                                               latLng,
-                                                               satelliteData,
-                                                               onSatelliteChange
-                                                           }) => {
+    isOpen,
+    onClose,
+    formData,
+    onInputChange,
+    onSubmit,
+    latLng,
+    satelliteData,
+    onSatelliteChange
+}) => {
     const [activeStep, setActiveStep] = useState(0);
 
     const handleNext = () => {
@@ -66,75 +120,89 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = ({
     };
 
     return (
-        <Paper
-            elevation={3}
-            sx={{
-                position: "absolute",
-                top: 0,
-                left: isOpen ? 0 : "-100%",
-                height: "calc(100% - 64px)",
-                width: "300px",
-                backgroundColor: "#fff",
-                transition: "left 0.3s ease-in-out",
-                zIndex: 1000,
-                display: "flex",
-                flexDirection: "column",
-                padding: "1rem",
-                marginTop: "64px",
-            }}
-        >
-            <Stepper activeStep={activeStep} alternativeLabel>
-                {steps.map((label, index) => (
-                    <Step key={index}>
-                        <StepLabel>{label}</StepLabel>
-                    </Step>
-                ))}
-            </Stepper>
-
-            <Box sx={{ flexGrow: 1, mt: 2 }}>{renderStepContent(activeStep)}</Box>
-
-            <Box
+        <ThemeProvider theme={pureBlackTheme}>
+            <Paper
+                elevation={3}
                 sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: isOpen ? 0 : "-100%",
+                    height: "calc(100% - 64px)",
+                    width: "300px",
+                    backgroundColor: "#000000",
+                    color: "#ffffff",
+                    transition: "left 0.3s ease-in-out",
+                    zIndex: 1000,
                     display: "flex",
-                    justifyContent: activeStep > 0 ? "space-between" : "center",
-                    mt: 2,
+                    flexDirection: "column",
+                    padding: "1rem",
+                    marginTop: "64px",
+                    borderRight: "1px solid #333333",
                 }}
             >
-                {activeStep > 0 && (
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleBack}
-                        sx={{ width: "48%" }}
-                    >
-                        Back
-                    </Button>
-                )}
-                {activeStep < steps.length - 1 ? (
-                    <Button
-                        variant="contained"
-                        onClick={handleNext}
-                        sx={{ width: activeStep > 0 ? "48%" : "100%" }}
-                    >
-                        Next
-                    </Button>
-                ) : (
-                    <Button
-                        variant="contained"
-                        onClick={onSubmit}
-                        sx={{ width: "48%" }}
-                    >
-                        Submit
-                    </Button>
-                )}
-            </Box>
+                <Stepper activeStep={activeStep} alternativeLabel>
+                    {steps.map((label, index) => (
+                        <Step key={index}>
+                            <StepLabel>{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
 
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                <Button variant="text" color="secondary" onClick={onClose} fullWidth>
-                    Close
-                </Button>
-            </Box>
-        </Paper>
+                <Box sx={{ flexGrow: 1, mt: 2 }}>{renderStepContent(activeStep)}</Box>
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: activeStep > 0 ? "space-between" : "center",
+                        mt: 2,
+                    }}
+                >
+                    {activeStep > 0 && (
+                        <Button
+                            variant="contained"
+                            onClick={handleBack}
+                            sx={{ width: "48%" }}
+                        >
+                            Back
+                        </Button>
+                    )}
+                    {activeStep < steps.length - 1 ? (
+                        <Button
+                            variant="contained"
+                            onClick={handleNext}
+                            sx={{ width: activeStep > 0 ? "48%" : "100%" }}
+                        >
+                            Next
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="contained"
+                            onClick={onSubmit}
+                            sx={{ width: "48%" }}
+                        >
+                            Submit
+                        </Button>
+                    )}
+                </Box>
+
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                    <Button 
+                        variant="contained" 
+                        onClick={onClose} 
+                        fullWidth
+                        sx={{
+                            color: '#000000',
+                            backgroundColor: '#ffffff',
+                            '&:hover': {
+                                backgroundColor: '#e0e0e0',
+                            },
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Box>
+            </Paper>
+        </ThemeProvider>
     );
 };
 

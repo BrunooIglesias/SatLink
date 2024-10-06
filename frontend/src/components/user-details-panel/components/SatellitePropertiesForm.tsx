@@ -43,9 +43,9 @@ const SatellitePropertiesForm: React.FC<SatellitePropertiesFormProps> = ({
                     onChange={(e) => onSatelliteChange('satellite', e.target.value)} // Update with key
                     label="Satellite"
                 >
-                    <MenuItem value="landsat9">Landsat 9</MenuItem>
-                    <MenuItem value="landsat8">Landsat 8</MenuItem>
-                    <MenuItem value="hsla">HSLA</MenuItem>
+                    <MenuItem value="LANDSAT/LC09/C02/T1_L2">Landsat 9</MenuItem>
+                    <MenuItem value="LANDSAT/LC08/C02/T1_L2">Landsat 8</MenuItem>
+                    <MenuItem value="NASA/HLS/HLSL30/v002">HSLA</MenuItem>
                 </Select>
             </FormControl>
 

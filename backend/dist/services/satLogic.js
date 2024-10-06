@@ -18,21 +18,24 @@ class SatLogic {
             var fs = require('fs');
             console.log('Earth Engine client initialized.');
             var endDate = ee.Date(Date.now());
-            var startDate = endDate.advance(-7, 'day');
+            var startDate = endDate.advance(-30, 'day');
             var collection = ee.ImageCollection(landsatCollection)
                 .filterDate(startDate, endDate);
             var latestImage = collection.sort('system:time_start', false).first();
-            var imageDate = latestImage.getInfo().properties.DATE_ACQUIRED;
-            var imageTime = latestImage.getInfo().properties.SCENE_CENTER_TIME;
-            console.log('Fecha y hora de foto más reciente:', imageDate, imageTime);
-            var geometry = latestImage.geometry();
-            var centroid = geometry.centroid();
-            var centroidCoordinates = centroid.coordinates().getInfo(); // Obtener información del centro
-            console.log('Centro de la imagen:', centroidCoordinates);
-            return centroidCoordinates;
+            if (latestImage) {
+                var imageDate = latestImage.getInfo().properties.DATE_ACQUIRED;
+                var imageTime = latestImage.getInfo().properties.SCENE_CENTER_TIME;
+                console.log('Fecha y hora de foto más reciente:', imageDate, imageTime);
+                var geometry = latestImage.geometry();
+                var centroid = geometry.centroid();
+                var centroidCoordinates = centroid.coordinates().getInfo(); // Obtener información del centro
+                console.log('Centro de la imagen:', centroidCoordinates);
+                return centroidCoordinates;
+            }
+            return null;
         });
         this.checkSats = () => __awaiter(this, void 0, void 0, function* () {
-            let satellites = ["LANDSAT/LC09/C02/T1_L2"]; // , ["LANDSAT/LC08/C02/T1_L2", "NASA/HLS/HLSL30/v002"];
+            let satellites = ["LANDSAT/LC09/C02/T1_L2", "LANDSAT/LC08/C02/T1_L2", "NASA/HLS/HLSL30/v002"];
             for (let i = 0; i < satellites.length; i++) {
                 yield this.checkAndSendPictures(satellites[i]);
             }
@@ -40,43 +43,53 @@ class SatLogic {
         this.checkAndSendPictures = (satellite) => __awaiter(this, void 0, void 0, function* () {
             let coordinates = yield this.getSatelliteLocation(satellite);
             console.log("Coordinates of " + satellite + ": ", coordinates);
-            let usersData = this.getInterestedUsers(coordinates, satellite);
+            let usersData = yield this.getInterestedUsers(coordinates, satellite);
+            if (usersData.length == 0) {
+                console.log("No users found for satellite: ", satellite);
+            }
             for (let i = 0; i < usersData.length; i++) {
                 this.generateData(usersData[i], satellite);
             }
         });
-        this.getInterestedUsers = (coordinates, satellite) => {
+        this.getInterestedUsers = (coordinates, satellite) => __awaiter(this, void 0, void 0, function* () {
             var ee = require('@google/earthengine');
-            var region = ee.Geometry.Polygon([
-                [[-58.5, -34.5], [-58.5, -30.0], [-53.0, -30.0], [-53.0, -34.5]]
-            ]);
-            (0, userRequests_1.getUsersInRegion)(region);
-            return [{ userMail: "santimoron001@gmail.com", coordinates: region, sat: satellite }];
-        };
+            let InterestedUsers = (0, userRequests_1.getUsersInRegion)(coordinates, satellite);
+            return InterestedUsers;
+        });
         this.generateData = (userData, satellite) => __awaiter(this, void 0, void 0, function* () {
             const ee = require('@google/earthengine');
             const fs = require('fs');
             const https = require('https');
             const sharp = require('sharp'); // Import sharp for image processing
             const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
-            console.log("Generating data for user: ", userData.userMail);
+            console.log("Generating data for user: ", userData.email);
+            let coord = [userData.coordinates.lat, userData.coordinates.lon];
+            let box = ee.Geometry.Polygon([[[userData.coordinates.lat - 0.1, userData.coordinates.lon - 0.1], [userData.coordinates.lat - 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon + 0.1], [userData.coordinates.lat + 0.1, userData.coordinates.lon - 0.1]]]);
             yield new Promise((resolve, reject) => {
                 ee.data.authenticateViaPrivateKey(privateKey, function () {
                     ee.initialize(null, null, function () {
                         console.log('Earth Engine client initialized.');
-                        const endDate = ee.Date(Date.now());
-                        const startDate = endDate.advance(-20, 'day');
+                        let endDate = ee.Date(Date.now());
+                        let startDate = endDate.advance(-20, 'day');
+                        if (userData.dateFilters) {
+                            endDate = ee.Date(userData.dateFilters.endDate);
+                            startDate = ee.Date(userData.dateFilters.startDate);
+                        }
                         //GET PICTURE
                         const collection = ee.ImageCollection(satellite)
                             .filterDate(startDate, endDate)
-                            .filterBounds(userData.coordinates)
-                            .sort('system:time_start', false);
+                            .filterBounds(box)
+                            .sort('system:time_start', false)
+                            .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
+                        ;
+                        console.log('Collection:', collection);
                         const mosaic = collection.mosaic(); // Usar mosaic para combinar imágenes
+                        console.log('Mosaic:', mosaic);
                         if (mosaic) {
                             const downloadURL = mosaic.getDownloadURL({
                                 name: satellite + "_mosaic",
                                 bands: ['SR_B4', 'SR_B3', 'SR_B2'], // Bandas RGB
-                                region: userData.coordinates,
+                                region: box,
                                 scale: 400,
                                 format: 'GEO_TIFF'
                             });
@@ -99,22 +112,35 @@ class SatLogic {
                                             // Read the JPEG image into a buffer
                                             const imageBuffer = fs.readFileSync(jpegFilePath);
                                             //SPECTRAL SIGNATURE
-                                            var geometry = collection.first().geometry();
-                                            var centroid = geometry.centroid();
-                                            var spectralValues = collection.first().reduceRegion({
-                                                reducer: ee.Reducer.first(),
-                                                geometry: centroid,
-                                                scale: 1000
-                                            }).getInfo();
-                                            console.log("Spectral values ", spectralValues);
+                                            if (userData.spectralSignature) {
+                                                var geometry = collection.first().geometry();
+                                                var centroid = geometry.centroid();
+                                                var spectralValues = collection.first().reduceRegion({
+                                                    reducer: ee.Reducer.first(),
+                                                    geometry: centroid,
+                                                    scale: 1000
+                                                }).getInfo();
+                                                console.log("Spectral values ", spectralValues);
+                                            }
+                                            //DATA VALUES
+                                            if (userData.dataValues) {
+                                                var temperatureBand = collection.select(['ST_B10']);
+                                                var pixelValue = temperatureBand.reduceRegion({
+                                                    reducer: ee.Reducer.mean(),
+                                                    geometry: coord,
+                                                    scale: 30
+                                                });
+                                            }
                                             //METADATA IN CSV FORMAT
-                                            collection.toDictionary().getInfo(function (metadata) {
-                                                var csvContent = convertMetadataToCSV(metadata);
-                                                fs.writeFileSync('landsat_image_metadata.csv', csvContent);
-                                                console.log('Metadata CSV saved as landsat_image_metadata.csv');
-                                            });
+                                            if (userData.metadata) {
+                                                collection.toDictionary().getInfo(function (metadata) {
+                                                    var csvContent = convertMetadataToCSV(metadata);
+                                                    fs.writeFileSync('landsat_image_metadata.csv', csvContent);
+                                                    console.log('Metadata CSV saved as landsat_image_metadata.csv');
+                                                });
+                                            }
                                             // Insert the result into the database
-                                            (0, userRequests_1.insertResult)(userData.userMail, userData.sat, imageBuffer);
+                                            (0, userRequests_1.insertResult)(userData.userMail, userData.sat, imageBuffer, userData.metadata, pixelValue, spectralValues);
                                             console.log("Result inserted correctly for: ", userData.userMail);
                                             resolve();
                                         }
