@@ -145,7 +145,6 @@ export class SatLogic {
                         geometry: point,
                         scale: 30
                       }).getInfo();
-                      pixelValue = (1321.0789 / Math.log((774.8853 / pixelValue) + 1)) - 273.15;
                     }
 
                     // Metadata in CSV format
