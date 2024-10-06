@@ -50,24 +50,23 @@ export class SatLogic {
     }
     let bandsToUse = ['SR_B4', 'SR_B3', 'SR_B2'];
     for (let userData of usersData) {
-      await this.generateData(userData, satellite, bandsToUse); // Await the data generation
+      await this.generateData(userData, satellite, bandsToUse);
     }
   }
 
-  // Method to get interested users
   getInterestedUsers = async (coordinates, satellite) => {
     var ee = require('@google/earthengine');
-    let InterestedUsers = await getUsersInRegion(coordinates, satellite); // Await the result
+    let InterestedUsers = await getUsersInRegion(coordinates, satellite); 
     return InterestedUsers;
   }
 
-  // Method to generate data
+
   generateData = async (userData, satellite, bandsToUse) => {
     const ee = require('@google/earthengine');
     const fs = require('fs');
     const https = require('https');
-    const sharp = require('sharp'); // Import sharp for image processing
-    const privateKey = JSON.parse(await fsPromises.readFile('./private-key.json', 'utf8')); // Use fsPromises
+    const sharp = require('sharp');
+    const privateKey = JSON.parse(await fsPromises.readFile('./private-key.json', 'utf8'));
 
     console.log("Generating data for user: ", userData.email);
     let point = ee.Geometry.Point([userData.coordinates.lon, userData.coordinates.lat]);
@@ -96,7 +95,7 @@ export class SatLogic {
             if (collection) {
               const downloadURL = await collection.getDownloadURL({
                 name: `${satellite}_image`,
-                bands: bandsToUse, // Bandas RGB
+                bands: bandsToUse, //  RGB
                 region: collection.geometry(),
                 scale: 500,
                 format: 'GEO_TIFF'
@@ -104,8 +103,7 @@ export class SatLogic {
 
               console.log('Download URL for the mosaic of Landsat image:', downloadURL);
 
-              // Use path module to create a valid file path
-              let filePath = path.join(__dirname, `${userData.email}.tif`); // Create the full path
+              let filePath = path.join(__dirname, `${userData.email}.tif`); 
               const file = fs.createWriteStream(filePath);
               https.get(downloadURL, function (response) {
                 response.pipe(file);
@@ -113,8 +111,8 @@ export class SatLogic {
                   file.close();
                   console.log("Image downloaded to " + filePath);
 
-                  // Convert the TIFF to JPEG using sharp
-                  const jpegFilePath = path.join(__dirname, `${userData.email}.jpg`); // Create JPEG file path
+
+                  let jpegFilePath = path.join(__dirname, `${userData.email}.jpg`); // Create JPEG file path
 
                   try {
                     await sharp(filePath)
@@ -154,7 +152,7 @@ export class SatLogic {
                     let csvContent = null;
                     if (userData.metadata === 1) {
                       console.log("Getting CSV metadata...");
-                      const metadata = await collection.toDictionary().getInfo(); // Use await
+                      const metadata = await collection.toDictionary().getInfo(); 
                       csvContent = convertMetadataToCSV(metadata);
                     }
 
@@ -185,14 +183,14 @@ export class SatLogic {
   generateURL = async (userData, satellite, bandsToUse) => {
     console.log("Generating data for user: ", userData.email);
     const ee = require('@google/earthengine');
-      const fs = require('fs');
-      const https = require('https');
-      const sharp = require('sharp');  // Import sharp for image processing
-      const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
-    // Create a point geometry based on user coordinates
+    const fs = require('fs');
+    const https = require('https');
+    const sharp = require('sharp');  
+    const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
+
     let point = ee.Geometry.Point([userData.coordinates.lon, userData.coordinates.lat]);
 
-    // Create a bounding box geometry around the user's location
+
     let box = ee.Geometry.Polygon([[
         [userData.coordinates.lon - 0.5, userData.coordinates.lat - 0.5],
         [userData.coordinates.lon - 0.5, userData.coordinates.lat + 0.5],
@@ -205,7 +203,7 @@ export class SatLogic {
             ee.initialize(null, null, async function() {
                 console.log('Earth Engine client initialized.');
 
-                // Define date range based on user input or default to last 60 days
+
                 let endDate = ee.Date(Date.now());
                 let startDate = endDate.advance(-60, 'day');
 
@@ -215,16 +213,15 @@ export class SatLogic {
                 }
 
                 try {
-                    // Fetch the first image from the collection
+
                     const collection = ee.ImageCollection(satellite)
                         .filterDate(startDate, endDate)
                         .filterBounds(point)
-                        .sort('system:time_start', false) // Sort by time, most recent first
-                        .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)) // Filter by cloud cover
+                        .sort('system:time_start', false) 
+                        .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)) 
                         .first();
 
                     if (collection) {
-                        // Get the download URL for the image
                         const downloadURL = await collection.getDownloadURL({
                             name: `${satellite}_image`,
                             bands: bandsToUse,  // Select bands to use, e.g., RGB bands
@@ -234,7 +231,8 @@ export class SatLogic {
                         });
 
                         console.log('Download URL generated:', downloadURL);
-                        let filePath = userData.email + ".tif";
+                        let timeStamp = new Date().getTime();
+                        let filePath = path.join(__dirname, `${userData.email}${timeStamp}.tif`); 
                       const file = fs.createWriteStream(filePath);
                       https.get(downloadURL, function(response) {
                           response.pipe(file);
@@ -243,8 +241,8 @@ export class SatLogic {
                               console.log("Image downloaded to " + userData.email + ".tif");
   
                               // Convert the TIFF to JPEG using sharp
-                              const jpegFilePath = userData.email + ".jpg";
-  
+                            
+                              let jpegFilePath = path.join(__dirname, `${userData.email}${timeStamp}.jpg`); // Create JPEG file path
                               try {
                                   await sharp(filePath)
                                       .jpeg() // Set JPEG quality if needed
