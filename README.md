@@ -2,6 +2,9 @@
 
 NASA-Challenge is a project that interacts with Google Earth APIs and includes email notifications via SMTP. This project runs entirely on Docker for easy setup and scalability.
 
+![image](https://github.com/user-attachments/assets/8f7032e0-705a-4d18-9139-246756e06ce5)
+![image](https://github.com/user-attachments/assets/2e17a4a7-b8ef-43a7-a5af-e4b04541e993)
+
 ## Prerequisites
 
 Before running the project, you'll need:
