@@ -34,7 +34,7 @@ const ImagePreviewPanel: React.FC<ImagePreviewPanelProps> = ({ isOpen, onClose, 
                     right: isOpen ? 0 : "-100%",
                     height: "calc(100% - 64px)",
                     width: "300px",
-                    backgroundColor: "#000000",
+                    backgroundColor: "#000000",  
                     color: "#ffffff",
                     transition: "right 0.3s ease-in-out",
                     zIndex: 1000,
@@ -47,7 +47,14 @@ const ImagePreviewPanel: React.FC<ImagePreviewPanelProps> = ({ isOpen, onClose, 
             >
                 <h2 style={{ marginBottom: "20px" }}>Preview Images</h2>
 
-                <Box sx={{ flexGrow: 1 }}>
+                {/* Scrollable container for images */}
+                <Box
+                    sx={{
+                        flexGrow: 1,
+                        overflowY: "auto",  
+                        maxHeight: "calc(100% - 120px)",
+                    }}
+                >
                     {previewImages.length > 0 ? (
                         previewImages.map((imgUrl, index) => (
                             <img
@@ -62,19 +69,27 @@ const ImagePreviewPanel: React.FC<ImagePreviewPanelProps> = ({ isOpen, onClose, 
                     )}
                 </Box>
 
-                <Button
-                    variant="contained"
-                    onClick={onClose}
+                {/* Position the Close button at the bottom and make it full-width */}
+                <Box
                     sx={{
-                        color: '#000000',
-                        backgroundColor: '#ffffff',
-                        '&:hover': {
-                            backgroundColor: '#e0e0e0',
-                        },
+                        mt: "auto", 
                     }}
                 >
-                    Close
-                </Button>
+                    <Button
+                        variant="contained"
+                        onClick={onClose}
+                        fullWidth 
+                        sx={{
+                            color: '#000000',
+                            backgroundColor: '#ffffff',
+                            '&:hover': {
+                                backgroundColor: '#e0e0e0',
+                            },
+                        }}
+                    >
+                        Close
+                    </Button>
+                </Box>
             </Paper>
         </ThemeProvider>
     );
