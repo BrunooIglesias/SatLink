@@ -6,12 +6,10 @@ export class UserLogic {
 
   createRequest = async (landsatCollection: requestDto) => {
     try {
-      // Type guard: Ensure latitude and longitude are numbers
       if (typeof landsatCollection.latitude !== 'number' || typeof landsatCollection.longitude !== 'number') {
         throw new Error("Latitude and longitude must be numbers.");
       }
 
-      // Create a single coordinate object
       const formattedCoordinates = {
         lat: landsatCollection.latitude,
         lon: landsatCollection.longitude
@@ -23,7 +21,7 @@ export class UserLogic {
       await insertRequest(
         landsatCollection.email,
         landsatCollection.name,
-        formattedCoordinates,  // Send a single coordinate, not an array
+        formattedCoordinates, 
         landsatCollection.satellite,
         landsatCollection.cloudThreshold,
         dateFilters,

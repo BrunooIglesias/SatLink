@@ -39,9 +39,9 @@ export async function insertResult(email,name,image, metadata, dataValues, spect
     const connection = await mysql.createConnection({
       host: 'localhost',
       port: 3306,
-      user: 'myuser',         // Replace with your MySQL username
-      password: 'mypassword', // Replace with your MySQL password
-      database: 'mydatabase', // Replace with your MySQL database name
+      user: 'myuser',  
+      password: 'mypassword',
+      database: 'mydatabase', 
   });
     const resultsRequestQuery = `
         INSERT INTO ResultsRequests (email, name, image, metadata, dataValues, spectralSignature, ImageFile) 
@@ -83,9 +83,8 @@ export async function getUsersInRegion(regionCoordinates, paramSatellite) {
     const usersInRegion: Array<{ id: number, email: string, coordinates: any, satellite : string, cloudCover : number, dateFilters : JSON, metadata:JSON, dataValues:JSON, spectralSignature:JSON}> = [];
 
     rows.forEach((row: { id: number, email: string, coordinates: any, satellite : string, cloudCover : number, dateFilters : JSON, metadata:JSON, dataValues:JSON, spectralSignature:JSON}) => {
-      const userCoordinates = row.coordinates; // Assuming coordinates are stored as JSON in DB
+      const userCoordinates = row.coordinates;
 
-      // Check if the user's coordinates are inside the region
       if (isPointInSquare(userCoordinates, regionCoordinates)) {
         usersInRegion.push({
           id: row.id,
@@ -138,12 +137,22 @@ export async function getResult(userParamId) {
   }
 }
 
-function isPointInSquare(point, square) {
+function isPointInSquare(point, center, size = 1) {
   return true;
-  const [lngP, latP] = point;
+  const [lngP, latP] = point; 
+  const [lngC, latC] = center;
+  const halfSize = size / 2;
 
-  const lats = square.map(coord => coord[1]); // Get latitudes from square
-  const lngs = square.map(coord => coord[0]); // Get longitudes from square
+  // Calculate the corners of the square
+  const square = [
+    [lngC - halfSize, latC - halfSize], 
+    [lngC - halfSize, latC + halfSize],
+    [lngC + halfSize, latC + halfSize], 
+    [lngC + halfSize, latC - halfSize]
+  ];
+
+  const lats = square.map(coord => coord[1]);
+  const lngs = square.map(coord => coord[0]);
 
   const minLat = Math.min(...lats);
   const maxLat = Math.max(...lats);
