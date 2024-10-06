@@ -24,7 +24,7 @@ const ImageContainer: React.FC<ImageContainerProps> = ({ imageData }) => {
             <Typography variant="h4" sx={{ marginBottom: '20px' }}>Satellite Image</Typography>
             <SatelliteImage src={image} />
 
-            <Typography variant="h5" sx={{ marginTop: '40px', marginBottom: '20px' }}>Surface Temperature (Kelvin)</Typography>
+            <Typography variant="h5" sx={{ marginTop: '40px', marginBottom: '20px' }}>Band 10 Surface Temperature</Typography>
             <Paper sx={{ padding: 2, backgroundColor: '#1e1e1e' }}>
                 <Grid container spacing={2}>
                     {Object.entries(transformedDataValues).map(([key, value]) => (
