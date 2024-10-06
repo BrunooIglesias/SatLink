@@ -89,8 +89,6 @@ export class SatLogic {
                                        .filterBounds(point)
                                        .sort('system:time_start', false)
                                        .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
-
-
                   try{
                   if (collection) {
                       const downloadURL = collection.getDownloadURL({
@@ -169,7 +167,7 @@ export class SatLogic {
                                   }
 
 
-                                  return imageBuffer;
+                                  return downloadURL;
                                   resolve();
                               } catch (error) {
                                   console.error("Error converting image:", error);
@@ -184,12 +182,76 @@ export class SatLogic {
           });
       });
   }
+  generateURL = async (userData, satellite, bandsToUse) => {
+    console.log("Generating data for user: ", userData.email);
+    const ee = require('@google/earthengine');
+    const fs = require('fs');
+    const https = require('https');
+    const sharp = require('sharp');  // Import sharp for image processing
+    const privateKey = JSON.parse(fs.readFileSync('./private-key.json', 'utf8'));
+    // Create a point geometry based on user coordinates
+    let point = ee.Geometry.Point([userData.coordinates.lon, userData.coordinates.lat]);
+
+    // Create a bounding box geometry around the user's location
+    let box = ee.Geometry.Polygon([[
+        [userData.coordinates.lon - 0.5, userData.coordinates.lat - 0.5],
+        [userData.coordinates.lon - 0.5, userData.coordinates.lat + 0.5],
+        [userData.coordinates.lon + 0.5, userData.coordinates.lat + 0.5],
+        [userData.coordinates.lon + 0.5, userData.coordinates.lat - 0.5]
+    ]]);
+
+    return new Promise((resolve, reject) => {
+        ee.data.authenticateViaPrivateKey(privateKey, function() {
+            ee.initialize(null, null, async function() {
+                console.log('Earth Engine client initialized.');
+
+                // Define date range based on user input or default to last 60 days
+                let endDate = ee.Date(Date.now());
+                let startDate = endDate.advance(-60, 'day');
+
+                if (userData.dateFilters && userData.dateFilters.startDate && userData.dateFilters.endDate) {
+                    endDate = ee.Date(userData.dateFilters.endDate);
+                    startDate = ee.Date(userData.dateFilters.startDate);
+                }
+
+                try {
+                    // Fetch the first image from the collection
+                    const collection = ee.ImageCollection(satellite)
+                        .filterDate(startDate, endDate)
+                        .filterBounds(point)
+                        .sort('system:time_start', false) // Sort by time, most recent first
+                        .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)) // Filter by cloud cover
+                        .first();
+
+                    if (collection) {
+                        // Get the download URL for the image
+                        const downloadURL = await collection.getDownloadURL({
+                            name: `${satellite}_image`,
+                            bands: bandsToUse,  // Select bands to use, e.g., RGB bands
+                            region: box,  // Use the bounding box geometry
+                            scale: 100,   // Scale in meters
+                            format: 'GEO_TIFF'  // Format to GeoTIFF
+                        });
+
+                        console.log('Download URL generated:', downloadURL);
+                        resolve(downloadURL);
+                    } else {
+                        reject(new Error(`No images found for satellite: ${satellite}`));
+                    }
+                } catch (err) {
+                    console.error("Error generating URL for satellite:", satellite, err);
+                    reject(err);
+                }
+            });
+        });
+    });
+};
+
 
   getPathRow = async (collection)=>{
-    // Get the Path and Row from the filtered result
     var path = "";
     var row = "";
-    await collection.toDictionary().getInfo(await function(metadata) {
+    await collection.getInfo(await function(metadata) {
       console.log("Metadata:", metadata);
         path = metadata.WRS_PATH;
         row = metadata.WRS_ROW;
