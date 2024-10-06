@@ -61,7 +61,7 @@ app.post('/preview', async (req, res) => {
   requestPayload.email = "preview3";
   let resultVegetation = await _satLogic.generateData(requestPayload, "LANDSAT/LC09/C02/T1_L2", ['SR_B6', 'SR_B5', 'SR_B4']);
   let pathRow = await _satLogic.getPathRow(resultNatural);
-  res.status(200).json([resultNatural, resultInfrared, resultVegetation], pathRow);
+  res.status(200).json([resultNatural, resultInfrared, resultVegetation, pathRow]);
 });
 
 
