@@ -26,6 +26,17 @@ The project is fully Dockerized, allowing you to build and run all components ea
 
 .bat files are for Windows, run the commands inside them manually for Linux or MacOS
 
+## Considerations
+
+This project was developed under time constraints during a 2-day hackathon. As such, you may notice:
+
+- **Lack of clean code**: The code is functional but not fully optimized or structured according to best practices.
+- **Missing standard practices**: Code comments, modularity, and comprehensive error handling might be incomplete.
+
+The focus was on delivering a working prototype rather than polished production code. Further improvements and refactoring are welcome!
+
+
+
 ## To-Do
 
 - [ ] Move credentials to a `.env` file for better security and configuration management.
