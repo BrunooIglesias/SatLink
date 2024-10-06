@@ -75,6 +75,10 @@ def send_email(to_email, name, image, id_name, csv_data):
     image_mime.add_header('Content-Disposition', f'attachment; filename="image.jpg"')  # Set the filename
     msg.attach(image_mime)
 
+    # Decode CSV data if it's bytes, otherwise assume it's already a string
+    if isinstance(csv_data, bytes):
+        csv_data = csv_data.decode('utf-8')
+
     # Attach the CSV file (from the metadata)
     csv_mime = MIMEText(csv_data, 'csv')
     csv_mime.add_header('Content-Disposition', 'attachment', filename="results.csv")
@@ -90,15 +94,6 @@ def send_email(to_email, name, image, id_name, csv_data):
     except Exception as e:
         print(f"Failed to send email to {to_email}: {e}")
 
-    try:
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()  # Upgrade the connection to a secure encrypted SSL/TLS connection
-            server.login(email_user, email_password)
-            server.send_message(msg)
-            print(f"Email sent to {to_email}")
-
-    except Exception as e:
-        print(f"Failed to send email to {to_email}: {e}")
 
 
 def mark_as_sent(request_id):
