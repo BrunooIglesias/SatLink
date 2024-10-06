@@ -79,89 +79,94 @@ export class SatLogic {
           console.log('Earth Engine client initialized.');
           let endDate = ee.Date(Date.now());
           let startDate = endDate.advance(-60, 'day');
-
+    
           if (userData.dateFilters.startDate !== '') {
             endDate = ee.Date(userData.dateFilters.endDate);
             startDate = ee.Date(userData.dateFilters.startDate);
           }
-
+    
           try {
-            const collection = ee.ImageCollection(satellite)
+            // Filter the image collection and select the first image
+            const image = ee.ImageCollection(satellite)
               .filterDate(startDate, endDate)
               .filterBounds(point)
               .sort('system:time_start', false)
-              .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover)).first();
-
-            if (collection) {
-              const downloadURL = await collection.getDownloadURL({
+              .filter(ee.Filter.lt('CLOUD_COVER', userData.cloudCover))
+              .first();
+    
+            // Check if an image was found
+            if (image) {
+              // Get the geometry of the first image
+              const imageGeometry = image.geometry();
+    
+              // Download the image as a GeoTIFF
+              const downloadURL = await image.getDownloadURL({
                 name: `${satellite}_image`,
-                bands: bandsToUse, //  RGB
-                region: collection.geometry(),
+                bands: bandsToUse, // RGB bands
+                region: imageGeometry, // Corrected to use the image's geometry
                 scale: 500,
                 format: 'GEO_TIFF'
               });
-
-              console.log('Download URL for the mosaic of Landsat image:', downloadURL);
-
-              let filePath = path.join(__dirname, `${userData.email}.tif`); 
+    
+              console.log('Download URL for the Landsat image:', downloadURL);
+    
+              let filePath = path.join(__dirname, `${userData.email}.tif`);
               const file = fs.createWriteStream(filePath);
               https.get(downloadURL, function (response) {
                 response.pipe(file);
                 file.on('finish', async function () {
                   file.close();
                   console.log("Image downloaded to " + filePath);
-
-
-                  let jpegFilePath = path.join(__dirname, `${userData.email}.jpg`); // Create JPEG file path
-
+    
+                  // Continue with the rest of your logic to process the image
+                  let jpegFilePath = path.join(__dirname, `${userData.email}.jpg`);
                   try {
                     await sharp(filePath)
-                      .jpeg({ quality: 80 })
+                      .jpeg()
                       .toFile(jpegFilePath);
-
+    
                     console.log("Image converted to JPEG: " + jpegFilePath);
-
+    
                     // Read the JPEG image into a buffer
                     const imageBuffer = await fsPromises.readFile(jpegFilePath);
-                    
+    
                     // Spectral Signature
                     let spectralValues = null;
                     if (userData.spectralSignature) {
-                      var geometry = collection.geometry();
-                      var centroid = geometry.centroid();
-                      spectralValues = await collection.reduceRegion({
+                      var centroid = imageGeometry.centroid();
+                      spectralValues = await image.reduceRegion({
                         reducer: ee.Reducer.first(),
                         geometry: centroid,
-                        scale: 1000
+                        scale: 300
                       }).getInfo();
                     }
-
+    
                     // Data Values
                     let pixelValue = null;
                     if (userData.dataValues === 1) {
-                      var temperatureBand = collection.select(['ST_B10']);
+                      var temperatureBand = image.select(['ST_B10']);
                       pixelValue = await temperatureBand.reduceRegion({
                         reducer: ee.Reducer.mean(),
                         geometry: point,
                         scale: 30
                       }).getInfo();
                     }
-
+    
                     // Metadata in CSV format
                     let fileName = '';
                     let csvContent = null;
                     if (userData.metadata === 1) {
                       console.log("Getting CSV metadata...");
-                      const metadata = await collection.toDictionary().getInfo(); 
+                      const metadata = await image.toDictionary().getInfo();
                       csvContent = convertMetadataToCSV(metadata);
                     }
-
+    
                     // Insert the result into the database
                     if (userData.email !== "preview" && userData.email !== "preview2" && userData.email !== "preview3") {
                       await insertResult(userData.email, userData.name, imageBuffer, csvContent, pixelValue, spectralValues, downloadURL);
                       console.log("Result inserted correctly for: ", userData.email);
                     }
-
+    
                     resolve(downloadURL);
                   } catch (error) {
                     console.error("Error converting image:", error);
@@ -170,7 +175,7 @@ export class SatLogic {
                 });
               });
             } else {
-              reject(new Error(`No mosaic found for satellite: ${satellite}`));
+              reject(new Error(`No image found for satellite: ${satellite}`));
             }
           } catch (error) {
             console.error("Error retrieving image:", error);
